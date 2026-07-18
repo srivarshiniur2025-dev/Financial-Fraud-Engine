@@ -157,36 +157,72 @@ Then open the local URL shown in the terminal (usually [http://localhost:8501](h
 
 ## Deploying on Vercel
 
-### Why you previously saw plain text
+### Why you saw `404: NOT_FOUND`
 
-`api/index.py` is a **serverless** handler. It only printed:
+After switching away from the serverless `/api` stub, `vercel.json` was:
 
-> Streamlit is starting from app.py via api/index.py...
+```json
+{ "framework": null }
+```
 
-Serverless Functions cannot host Streamlit’s WebSocket UI. The browser never
-received the real Streamlit interface.
+That configuration:
 
-### Current approach: Docker container
+1. Disabled framework auto-detection
+2. Removed all rewrites to `/api`
+3. Did **not** explicitly wire traffic to `Dockerfile.vercel`
 
-This project deploys Streamlit with **`Dockerfile.vercel`**.
+If Vercel did not build/attach the container (common on plans or settings where container Functions are unavailable or not detected), the deployment has **no routes and no static output** → Vercel returns **`404: NOT_FOUND`**.
 
-| File | Role |
+### Current fix
+
+`vercel.json` now declares an explicit container service and rewrites every path to it:
+
+```json
+{
+  "framework": null,
+  "services": {
+    "streamlit": {
+      "root": ".",
+      "entrypoint": "Dockerfile.vercel"
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": { "service": "streamlit" } }
+  ]
+}
+```
+
+`Dockerfile.vercel` still runs:
+
+```bash
+streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
+```
+
+### Platform limitation (important)
+
+| Approach | Result |
 |---|---|
-| `Dockerfile.vercel` | Builds a container that runs `streamlit run app.py` on `$PORT` |
-| `vercel.json` | Disables wrong framework detection; does **not** route to `/api` |
-| `.streamlit/config.toml` | Headless / CORS settings for reverse-proxy hosting |
+| Vercel Serverless (`api/index.py`) | Cannot host Streamlit UI (no persistent WebSockets / long-running server) |
+| Vercel Container (`Dockerfile.vercel`) | Can host Streamlit **if** container Functions are enabled for your Vercel plan/project |
+| Streamlit Community Cloud / Render / Railway | Best fit for Streamlit with **zero app code changes** |
 
-### Deploy steps
+Streamlit is a long-running Tornado/ASGI-style app with WebSockets. Vercel’s default model is short-lived serverless request handlers. Containers are the only Vercel path that can work, and they may require Fluid compute / a plan that supports custom container images.
 
-1. Push to GitHub.
-2. Import/redeploy the project in [Vercel](https://vercel.com).
-3. Confirm Vercel detects **Dockerfile / container** (not only Python serverless).
-4. Add `data/creditcard.csv` and `fraud_model.pkl` into the deploy environment (or bake them into the image) — both are gitignored by default.
+### Minimum architectural change if containers are unavailable
 
-### About the previous FastAPI/Flask error
+Do **not** rewrite the ML or Streamlit UI. Instead host the same repo on:
 
-Root `app.py` is Streamlit, not FastAPI. Container mode avoids expecting an
-`app` / `application` / `handler` export from that file.
+1. [Streamlit Community Cloud](https://streamlit.io/cloud) (connect GitHub → set `app.py`)
+2. Or Render / Railway (Docker or `streamlit run app.py`)
+
+That is the smallest change: **platform only**, same `app.py` / `model.py` / `utils.py`.
+
+### Deploy checklist on Vercel
+
+1. Push latest `vercel.json` + `Dockerfile.vercel`
+2. Redeploy
+3. In build logs, confirm **Docker image build** (not only Python serverless)
+4. Provide `data/creditcard.csv` and `fraud_model.pkl` in the runtime (gitignored by default)
 
 ---
 
