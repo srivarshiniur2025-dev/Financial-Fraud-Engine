@@ -5,28 +5,58 @@ Helper functions for the Financial Fraud Intelligence Engine.
 Includes data loading, dataset summary, charts, and risk scoring.
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
 DATA_PATH = "data/creditcard.csv"
 
 
-def load_data(path=DATA_PATH):
+def dataset_exists(path=DATA_PATH):
+    """Return True if the dataset file is present on disk."""
+    return Path(path).is_file()
+
+
+def load_dataset(path=None, file_like=None):
     """
-    Load the credit card dataset from a CSV file.
+    Load the credit card dataset from a path or an uploaded file-like object.
 
     Parameters
     ----------
-    path : str
-        Path to the CSV file (default: data/creditcard.csv).
+    path : str, optional
+        Filesystem path to the CSV. Defaults to DATA_PATH when file_like is None.
+    file_like : file-like, optional
+        An uploaded CSV (e.g. from st.file_uploader). Takes precedence over path.
 
     Returns
     -------
     pandas.DataFrame
         The loaded dataset.
+
+    Raises
+    ------
+    FileNotFoundError
+        If loading from path and the file does not exist.
+    ValueError
+        If neither a valid path nor a file-like object is provided.
     """
-    df = pd.read_csv(path)
-    return df
+    if file_like is not None:
+        return pd.read_csv(file_like)
+
+    resolved = DATA_PATH if path is None else path
+    if not dataset_exists(resolved):
+        raise FileNotFoundError(f"Dataset not found at {resolved}")
+    return pd.read_csv(resolved)
+
+
+def load_data(path=DATA_PATH):
+    """
+    Load the credit card dataset from a CSV file.
+
+    Thin wrapper around load_dataset for backward compatibility.
+    """
+    return load_dataset(path=path)
 
 
 def get_dataset_summary(df):

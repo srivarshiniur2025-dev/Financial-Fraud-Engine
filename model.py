@@ -17,7 +17,8 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 
-DATA_PATH = "data/creditcard.csv"
+from utils import DATA_PATH, load_dataset
+
 MODEL_PATH = "fraud_model.pkl"
 
 # Exact feature order used during training (all columns except Class)
@@ -32,7 +33,7 @@ FEATURE_COLUMNS = [
 
 def load_data(path=DATA_PATH):
     """Load the credit card dataset from a CSV file."""
-    df = pd.read_csv(path)
+    df = load_dataset(path=path)
     print("Dataset loaded successfully.")
     print("Shape:", df.shape)
     return df

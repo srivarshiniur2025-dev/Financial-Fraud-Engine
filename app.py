@@ -14,7 +14,18 @@ import pandas as pd
 import streamlit as st
 
 from model import load_saved_model, predict_transaction
-from utils import calculate_risk_score, get_dataset_summary, load_data
+from utils import (
+    DATA_PATH,
+    calculate_risk_score,
+    dataset_exists,
+    get_dataset_summary,
+    load_dataset,
+)
+
+DATASET_MISSING_MSG = (
+    "Dataset not found. Please upload creditcard.csv to use the dashboard."
+)
+SESSION_DATASET_KEY = "dataset_df"
 
 # Must match the feature order used when training the Random Forest in model.py
 FEATURE_COLUMNS = [
@@ -444,11 +455,68 @@ def inject_styles():
 
 
 # ---------------------------------------------------------------------------
-# Backend helpers (unchanged behavior)
+# Dataset loading (disk file or in-session upload)
 # ---------------------------------------------------------------------------
 @st.cache_data
-def get_cached_data():
-    return load_data()
+def _cached_load_from_disk(path: str):
+    return load_dataset(path=path)
+
+
+def get_active_dataset():
+    """
+    Return the active credit-card dataset, or None if unavailable.
+
+    Preference order:
+    1. CSV uploaded in this session (cached in session_state)
+    2. data/creditcard.csv on disk
+    """
+    uploaded_df = st.session_state.get(SESSION_DATASET_KEY)
+    if uploaded_df is not None:
+        return uploaded_df
+    if dataset_exists(DATA_PATH):
+        return _cached_load_from_disk(DATA_PATH)
+    return None
+
+
+def cache_uploaded_dataset(file_like):
+    """Load an uploaded CSV into session state and refresh dependent caches."""
+    df = load_dataset(file_like=file_like)
+    st.session_state[SESSION_DATASET_KEY] = df
+    get_dashboard_score_sample.clear()
+    return df
+
+
+def ensure_dataset_ready(uploader_key="dataset_upload"):
+    """
+    Ensure a dataset is available for dashboard/demo features.
+
+    If missing, show a friendly warning and file uploader. After a successful
+    upload the dataframe is cached in session state and the app reruns so all
+    features unlock without a process restart.
+
+    Returns
+    -------
+    pandas.DataFrame or None
+    """
+    df = get_active_dataset()
+    if df is not None:
+        return df
+
+    st.warning(DATASET_MISSING_MSG)
+    uploaded = st.file_uploader(
+        "Upload creditcard.csv",
+        type=["csv"],
+        key=uploader_key,
+        help="Upload the Kaggle Credit Card Fraud Detection CSV.",
+    )
+    if uploaded is not None:
+        try:
+            df = cache_uploaded_dataset(uploaded)
+            st.success(f"Dataset loaded successfully ({len(df):,} rows).")
+            st.rerun()
+        except Exception as error:
+            st.error(f"Could not load dataset: {error}")
+    return None
 
 
 def hour_to_dataset_time(hour):
@@ -457,10 +525,12 @@ def hour_to_dataset_time(hour):
 
 def sample_transaction(mode="random"):
     """
-    Load a complete real transaction from creditcard.csv.
+    Load a complete real transaction from the active dataset.
     mode: "random" | "genuine" | "fraud"
     """
-    df = get_cached_data()
+    df = get_active_dataset()
+    if df is None:
+        raise FileNotFoundError(DATASET_MISSING_MSG)
 
     if mode == "genuine":
         subset = df[df["Class"] == 0]
@@ -546,9 +616,8 @@ def process_batch_dataframe(upload_df):
 
 
 @st.cache_data
-def get_dashboard_score_sample(sample_size=3000, random_state=42):
-    df = get_cached_data()
-    sample = df.sample(n=min(sample_size, len(df)), random_state=random_state)
+def get_dashboard_score_sample(_df, sample_size=3000, random_state=42):
+    sample = _df.sample(n=min(sample_size, len(_df)), random_state=random_state)
     scored, missing = process_batch_dataframe(sample)
     if missing:
         return None
@@ -711,7 +780,11 @@ def home_page():
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
-    summary = get_dataset_summary(get_cached_data())
+    df = ensure_dataset_ready(uploader_key="home_dataset_upload")
+    if df is None:
+        return
+
+    summary = get_dataset_summary(df)
     k1, k2, k3, k4 = st.columns(4)
     with k1:
         rich_kpi("💳", "Total Transactions", f"{summary['num_rows']:,}", "Records in the Kaggle dataset")
@@ -807,6 +880,9 @@ def render_demo_prediction():
         """,
         unsafe_allow_html=True,
     )
+
+    if ensure_dataset_ready(uploader_key="demo_dataset_upload") is None:
+        return
 
     ensure_sample_loaded()
 
@@ -1060,7 +1136,10 @@ def dashboard_page():
         "Professional analytics overview of dataset volume and model risk signals.",
     )
 
-    df = get_cached_data()
+    df = ensure_dataset_ready(uploader_key="dashboard_dataset_upload")
+    if df is None:
+        return
+
     summary = get_dataset_summary(df)
     total = summary["num_rows"]
     genuine = summary["genuine_transactions"]
@@ -1078,7 +1157,7 @@ def dashboard_page():
         rich_kpi("📈", "Fraud Rate", f"{fraud_rate:.3f}%", "Fraud share of dataset")
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
-    scored = get_dashboard_score_sample()
+    scored = get_dashboard_score_sample(df)
 
     c1, c2 = st.columns(2)
     with c1:
@@ -1200,6 +1279,26 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     page = st.radio("Navigation", PAGES, label_visibility="collapsed")
+
+    if get_active_dataset() is None:
+        st.markdown("---")
+        st.caption("Dataset not on disk — upload to unlock demo & dashboard.")
+        sidebar_upload = st.file_uploader(
+            "Upload creditcard.csv",
+            type=["csv"],
+            key="sidebar_dataset_upload",
+        )
+        if sidebar_upload is not None:
+            try:
+                df = cache_uploaded_dataset(sidebar_upload)
+                st.success(f"Loaded {len(df):,} rows")
+                st.rerun()
+            except Exception as error:
+                st.error(f"Upload failed: {error}")
+    else:
+        st.markdown("---")
+        st.caption("Dataset ready")
+
     st.markdown(
         """
         <div class="sidebar-meta">
