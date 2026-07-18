@@ -17,7 +17,7 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import train_test_split
 
-from utils import DATA_PATH, load_dataset
+from utils import load_data as load_csv_from_disk
 
 MODEL_PATH = "fraud_model.pkl"
 
@@ -31,9 +31,9 @@ FEATURE_COLUMNS = [
 ]
 
 
-def load_data(path=DATA_PATH):
+def load_data(path=None):
     """Load the credit card dataset from a CSV file."""
-    df = load_dataset(path=path)
+    df = load_csv_from_disk(path=path)
     print("Dataset loaded successfully.")
     print("Shape:", df.shape)
     return df

@@ -11,52 +11,51 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 DATA_PATH = "data/creditcard.csv"
+ROOT_DATA_PATH = "creditcard.csv"
 
 
-def dataset_exists(path=DATA_PATH):
-    """Return True if the dataset file is present on disk."""
-    return Path(path).is_file()
-
-
-def load_dataset(path=None, file_like=None):
+def resolve_dataset_path():
     """
-    Load the credit card dataset from a path or an uploaded file-like object.
+    Locate the credit-card CSV on disk.
+
+    Checks, in order:
+    1. data/creditcard.csv
+    2. creditcard.csv (project root)
+
+    Returns
+    -------
+    str or None
+        Path string if found, otherwise None.
+    """
+    if Path(DATA_PATH).is_file():
+        return DATA_PATH
+    if Path(ROOT_DATA_PATH).is_file():
+        return ROOT_DATA_PATH
+    return None
+
+
+def load_data(path=None):
+    """
+    Load the credit card dataset from disk (CLI / training use).
 
     Parameters
     ----------
     path : str, optional
-        Filesystem path to the CSV. Defaults to DATA_PATH when file_like is None.
-    file_like : file-like, optional
-        An uploaded CSV (e.g. from st.file_uploader). Takes precedence over path.
+        Explicit CSV path. If omitted or missing, uses resolve_dataset_path().
 
     Returns
     -------
     pandas.DataFrame
-        The loaded dataset.
-
-    Raises
-    ------
-    FileNotFoundError
-        If loading from path and the file does not exist.
-    ValueError
-        If neither a valid path nor a file-like object is provided.
     """
-    if file_like is not None:
-        return pd.read_csv(file_like)
+    if path is not None and Path(path).is_file():
+        return pd.read_csv(path)
 
-    resolved = DATA_PATH if path is None else path
-    if not dataset_exists(resolved):
-        raise FileNotFoundError(f"Dataset not found at {resolved}")
+    resolved = resolve_dataset_path()
+    if resolved is None:
+        raise FileNotFoundError(
+            f"Dataset not found. Place the file at '{DATA_PATH}' or '{ROOT_DATA_PATH}'."
+        )
     return pd.read_csv(resolved)
-
-
-def load_data(path=DATA_PATH):
-    """
-    Load the credit card dataset from a CSV file.
-
-    Thin wrapper around load_dataset for backward compatibility.
-    """
-    return load_dataset(path=path)
 
 
 def get_dataset_summary(df):
