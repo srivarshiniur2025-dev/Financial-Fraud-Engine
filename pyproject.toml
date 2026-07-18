@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "Streamlit fraud detection engine"
 requires-python = ">=3.11"
 
-# Point Vercel at api/index.py so root app.py is NOT treated as FastAPI/Flask.
-# Dependencies are installed from requirements.txt (not duplicated here).
+# Dependencies come from requirements.txt only (avoids duplicate/conflicting sources).
+# Point Vercel at api/index.py so root Streamlit app.py is not treated as FastAPI/Flask.
 [tool.vercel]
 entrypoint = "api.index:handler"

@@ -1,8 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "pip install -r requirements.txt",
-  "buildCommand": "python -c \"import streamlit, pandas, sklearn, matplotlib, joblib; print('deps-ok')\"",
+  "installCommand": "python -m pip install --upgrade pip && python -m pip install -r requirements.txt",
   "functions": {
     "api/index.py": {
       "maxDuration": 60,

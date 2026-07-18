@@ -1,7 +1,5 @@
-# Direct dependencies for Financial Fraud Intelligence Engine
-# Compatible with Python 3.12 and 3.13 (Vercel-supported runtimes)
-# Transitive Streamlit deps (altair, pillow, protobuf, tornado, watchdog)
-# are installed automatically — do not pin them here (avoids resolver conflicts).
+# Direct app dependencies only (Python 3.12 / 3.13, Linux wheels available).
+# Do not pin Streamlit transitive deps (pillow, protobuf, altair, pyarrow, etc.).
 
 streamlit>=1.32.0,<2.0.0
 pandas>=2.2.0,<4.0.0
