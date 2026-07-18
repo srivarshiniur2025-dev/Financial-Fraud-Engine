@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
-from model import load_saved_model, predict_transaction
+from model import MODEL_UNAVAILABLE_MSG, get_model as resolve_model, predict_transaction
 from utils import (
     DEMO_DATA_PATH,
     DATA_PATH,
@@ -41,18 +41,31 @@ FULL_NAME = "Srivarshini U R"
 REGISTERED_EMAIL = "srivarshini.ur2025@vitstudent.ac.in"
 PROJECT_TOPIC = "AI-powered Credit Card Fraud Detection"
 PROJECT_SUBTITLE = (
-    "AI-powered fraud detection and transaction risk analysis using Machine Learning."
+    "AI-powered fraud detection and transaction risk intelligence using Machine Learning."
 )
 
-PRIMARY = "#B77466"
-ACCENT = "#FFE1AF"
-SECONDARY = "#E2B59A"
-DARK_NEUTRAL = "#957C62"
-BACKGROUND = "#FFFFFF"
-LIGHT_BG = "#F8F7F5"
-PRIMARY_TEXT = "#2C2C2C"
-SUCCESS = "#22C55E"
+# Premium fintech palette
+DEEP_NAVY = "#0F3040"
+SLATE_GRAY = "#464858"
+TERRACOTTA = "#A56F63"
+WARM_SAND = "#D99B7F"
+PRIMARY = DEEP_NAVY
+PRIMARY_HOVER = "#173C50"
+SECONDARY = TERRACOTTA
+ACCENT = WARM_SAND
+BACKGROUND = "#F8F9FA"
+CARD_BG = "#FFFFFF"
+BORDER = "rgba(15, 48, 64, 0.12)"
+PRIMARY_TEXT = DEEP_NAVY
+SECONDARY_TEXT = SLATE_GRAY
+SUCCESS = "#16A34A"
+SUCCESS_SOFT = "#15803D"
 DANGER = "#DC2626"
+DANGER_SOFT = "#E11D48"
+INFO = "#E8EEF2"
+GRID = "#E5E7EB"
+LIGHT_BG = CARD_BG
+DARK_NEUTRAL = SLATE_GRAY
 
 PAGES = [
     "🏠 Home",
@@ -74,159 +87,220 @@ def inject_styles():
     st.markdown(
         f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(10px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        @keyframes fillBar {{
+            from {{ width: 0 !important; }}
+        }}
 
         html, body, [class*="css"] {{
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }}
         .stApp {{
             background: {BACKGROUND};
-            color: {PRIMARY_TEXT};
+            color: {SECONDARY_TEXT};
         }}
         .block-container {{
             padding-top: 1.75rem;
             padding-bottom: 2.5rem;
             max-width: 1200px;
         }}
+
+        /* ---------- Sidebar ---------- */
         [data-testid="stSidebar"] {{
-            background: {LIGHT_BG};
-            border-right: 1px solid {SECONDARY};
+            background: {DEEP_NAVY} !important;
+            border-right: none;
+        }}
+        [data-testid="stSidebar"] * {{
+            color: rgba(255, 255, 255, 0.92);
         }}
         [data-testid="stSidebar"] .stRadio > div {{
-            gap: 0.35rem;
+            gap: 0.4rem;
         }}
         [data-testid="stSidebar"] .stRadio label {{
-            background: {BACKGROUND};
+            background: transparent;
             border: 1px solid transparent;
             border-radius: 12px;
-            padding: 0.65rem 0.85rem !important;
+            padding: 0.7rem 0.9rem !important;
             transition: all 0.2s ease;
+            color: #fff !important;
         }}
         [data-testid="stSidebar"] .stRadio label:hover {{
-            border-color: {SECONDARY};
-            box-shadow: 0 4px 14px rgba(149, 124, 98, 0.12);
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.12) !important;
+            transform: translateX(2px);
         }}
-        [data-testid="stSidebar"] .stRadio [aria-checked="true"] + div,
-        [data-testid="stSidebar"] label[data-baseweb="radio"]:has(input:checked) {{
-            background: linear-gradient(135deg, {PRIMARY}, {DARK_NEUTRAL}) !important;
-            color: white !important;
+        [data-testid="stSidebar"] .stRadio label p,
+        [data-testid="stSidebar"] .stRadio label span {{
+            color: #fff !important;
         }}
         div[role="radiogroup"] label:has(input:checked) {{
-            background: linear-gradient(90deg, {PRIMARY}22, {ACCENT}55) !important;
-            border: 1px solid {PRIMARY} !important;
-            box-shadow: 0 4px 16px rgba(183, 116, 102, 0.18);
+            background: {WARM_SAND} !important;
+            border: 1px solid {WARM_SAND} !important;
+            box-shadow: 0 8px 20px rgba(217, 155, 127, 0.35);
         }}
-        h1, h2, h3 {{
+        div[role="radiogroup"] label:has(input:checked) p,
+        div[role="radiogroup"] label:has(input:checked) span {{
+            color: {DEEP_NAVY} !important;
+            font-weight: 700 !important;
+        }}
+
+        h1, h2, h3, h4 {{
             color: {PRIMARY_TEXT};
             letter-spacing: -0.02em;
+            font-weight: 700;
         }}
+        p, label, .stMarkdown {{
+            color: {SECONDARY_TEXT};
+        }}
+
+        /* ---------- Hero ---------- */
         .premium-hero {{
-            background: linear-gradient(135deg, {PRIMARY} 0%, {DARK_NEUTRAL} 100%);
+            background: linear-gradient(145deg, {DEEP_NAVY} 0%, {SLATE_GRAY} 100%);
             border-radius: 24px;
-            padding: 2.75rem 2.25rem;
-            box-shadow: 0 16px 40px rgba(183, 116, 102, 0.28);
-            margin-bottom: 1.75rem;
+            padding: 2.85rem 2.4rem;
+            box-shadow: 0 18px 44px rgba(15, 48, 64, 0.28);
+            margin-bottom: 1.85rem;
             position: relative;
             overflow: hidden;
+            animation: fadeIn 0.55s ease both;
         }}
-        .premium-hero::after {{
-            content: "";
+        .premium-hero .orb {{
             position: absolute;
-            right: -40px;
-            top: -40px;
-            width: 180px;
-            height: 180px;
-            background: {ACCENT}33;
             border-radius: 50%;
+            pointer-events: none;
+        }}
+        .premium-hero .orb-a {{
+            width: 200px;
+            height: 200px;
+            right: -48px;
+            top: -56px;
+            background: radial-gradient(circle, {TERRACOTTA}88 0%, transparent 70%);
+        }}
+        .premium-hero .orb-b {{
+            width: 140px;
+            height: 140px;
+            right: 90px;
+            bottom: -50px;
+            background: radial-gradient(circle, {WARM_SAND}77 0%, transparent 70%);
+        }}
+        .premium-hero .orb-c {{
+            width: 90px;
+            height: 90px;
+            left: 8%;
+            bottom: -30px;
+            background: radial-gradient(circle, {TERRACOTTA}55 0%, transparent 70%);
         }}
         .premium-hero h1 {{
             color: #fff !important;
-            font-size: 2.45rem;
-            font-weight: 700;
-            margin: 0 0 0.6rem 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 0 0.65rem 0;
             position: relative;
             z-index: 1;
+            letter-spacing: -0.03em;
         }}
         .premium-hero p {{
-            color: {ACCENT};
+            color: rgba(255, 255, 255, 0.88) !important;
             font-size: 1.12rem;
             margin: 0;
             max-width: 720px;
             position: relative;
             z-index: 1;
+            line-height: 1.55;
+            font-weight: 400;
         }}
-        .feature-card, .kpi-rich, .metric-card, .panel-card, .chart-card, .info-card {{
-            background: {LIGHT_BG};
-            border: 1px solid {SECONDARY};
+
+        /* ---------- Cards ---------- */
+        .feature-card, .kpi-rich, .metric-card, .panel-card, .chart-card,
+        .info-card, .detail-card, .sample-meta-card, .recommend-card {{
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid {BORDER};
             border-radius: 18px;
-            box-shadow: 0 8px 24px rgba(149, 124, 98, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 30px rgba(15, 48, 64, 0.08);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            animation: fadeIn 0.5s ease both;
         }}
-        .feature-card:hover, .kpi-rich:hover, .metric-card:hover, .panel-card:hover, .chart-card:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 14px 32px rgba(149, 124, 98, 0.14);
+        .feature-card:hover, .kpi-rich:hover, .metric-card:hover,
+        .panel-card:hover, .chart-card:hover, .detail-card:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(15, 48, 64, 0.14);
         }}
         .feature-card {{
-            padding: 1.35rem 1.2rem;
+            padding: 1.4rem 1.25rem;
             min-height: 150px;
             height: 100%;
         }}
-        .feature-card .icon {{ font-size: 1.5rem; margin-bottom: 0.55rem; }}
+        .feature-card .icon {{ font-size: 1.55rem; margin-bottom: 0.55rem; }}
         .feature-card h4 {{
-            color: {PRIMARY};
+            color: {DEEP_NAVY};
             margin: 0 0 0.4rem 0;
             font-size: 1.05rem;
         }}
         .feature-card p {{
-            color: {DARK_NEUTRAL};
+            color: {SLATE_GRAY};
             margin: 0;
             font-size: 0.92rem;
             line-height: 1.45;
         }}
+
+        /* ---------- Metric / KPI cards ---------- */
         .kpi-rich {{
-            padding: 1.2rem 1.1rem;
+            padding: 1.25rem 1.15rem;
             text-align: left;
             height: 100%;
         }}
-        .kpi-rich .icon {{ font-size: 1.35rem; margin-bottom: 0.45rem; }}
+        .kpi-rich .icon {{ font-size: 1.35rem; margin-bottom: 0.45rem; color: {DEEP_NAVY}; }}
         .kpi-rich .value {{
             font-size: 1.7rem;
-            font-weight: 700;
-            color: {PRIMARY_TEXT};
+            font-weight: 800;
+            color: {DEEP_NAVY};
             line-height: 1.2;
         }}
         .kpi-rich .label {{
-            color: {PRIMARY};
+            color: {DEEP_NAVY};
             font-weight: 600;
             font-size: 0.95rem;
             margin-top: 0.2rem;
         }}
         .kpi-rich .desc {{
-            color: {DARK_NEUTRAL};
+            color: {SLATE_GRAY};
             font-size: 0.82rem;
             margin-top: 0.35rem;
         }}
+        .kpi-rich.kpi-total .icon {{ color: {DEEP_NAVY}; }}
+        .kpi-rich.kpi-fraud .icon,
+        .kpi-rich.kpi-fraud .value {{ color: {TERRACOTTA}; }}
+        .kpi-rich.kpi-genuine .icon,
+        .kpi-rich.kpi-genuine .value {{ color: {SUCCESS}; }}
+        .kpi-rich.kpi-rate .icon,
+        .kpi-rich.kpi-rate .value {{ color: {WARM_SAND}; }}
+
         .page-header h1 {{
             font-size: 2rem;
             margin-bottom: 0.35rem;
+            color: {DEEP_NAVY};
         }}
         .page-header p {{
-            color: {DARK_NEUTRAL};
+            color: {SLATE_GRAY};
             margin: 0 0 1.25rem 0;
             font-size: 1.02rem;
         }}
         .section-divider {{
             height: 1px;
-            background: linear-gradient(90deg, {SECONDARY}, transparent);
+            background: linear-gradient(90deg, {BORDER}, transparent);
             margin: 1.5rem 0;
             border: none;
         }}
         .info-card {{
             padding: 1rem 1.2rem;
-            border-left: 5px solid {PRIMARY};
-            background: linear-gradient(90deg, {ACCENT}55, {LIGHT_BG});
-            color: {PRIMARY_TEXT};
+            border-left: 5px solid {DEEP_NAVY};
+            background: linear-gradient(90deg, {INFO}, {CARD_BG});
+            color: {SECONDARY_TEXT};
             margin: 0.75rem 0 1.1rem 0;
         }}
         .panel-card {{
@@ -235,176 +309,234 @@ def inject_styles():
         }}
         .panel-card h3 {{
             margin: 0 0 0.85rem 0;
-            color: {PRIMARY_TEXT};
+            color: {DEEP_NAVY};
             font-size: 1.15rem;
         }}
+
+        /* ---------- Prediction status ---------- */
         .status-genuine {{
-            background: #ECFDF5;
-            border: 2px solid {SUCCESS};
+            background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+            border: none;
             border-radius: 18px;
-            padding: 1.35rem 1.4rem;
-            box-shadow: 0 10px 28px rgba(34, 197, 94, 0.12);
+            padding: 1.45rem 1.5rem;
+            box-shadow: 0 14px 34px rgba(22, 163, 74, 0.28);
+            color: #fff;
+            animation: fadeIn 0.45s ease both;
         }}
         .status-fraud {{
-            background: #FEF2F2;
-            border: 2px solid {DANGER};
+            background: linear-gradient(135deg, #DC2626 0%, #9F1239 100%);
+            border: none;
             border-radius: 18px;
-            padding: 1.35rem 1.4rem;
-            box-shadow: 0 10px 28px rgba(220, 38, 38, 0.12);
+            padding: 1.45rem 1.5rem;
+            box-shadow: 0 14px 34px rgba(220, 38, 38, 0.28);
+            color: #fff;
+            animation: fadeIn 0.45s ease both;
         }}
-        .status-genuine .badge {{
-            display: inline-block;
-            background: {SUCCESS};
-            color: white;
-            border-radius: 999px;
-            padding: 0.2rem 0.7rem;
-            font-size: 0.78rem;
-            font-weight: 600;
-            margin-bottom: 0.55rem;
-        }}
+        .status-genuine .badge,
         .status-fraud .badge {{
             display: inline-block;
-            background: {DANGER};
+            background: rgba(255, 255, 255, 0.22);
             color: white;
             border-radius: 999px;
-            padding: 0.2rem 0.7rem;
+            padding: 0.25rem 0.75rem;
             font-size: 0.78rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 0.55rem;
+            letter-spacing: 0.04em;
         }}
-        .status-genuine h2 {{ color: {SUCCESS}; margin: 0.2rem 0; font-size: 1.55rem; }}
-        .status-fraud h2 {{ color: {DANGER}; margin: 0.2rem 0; font-size: 1.55rem; }}
-        .status-genuine p, .status-fraud p {{
+        .status-genuine h2,
+        .status-fraud h2 {{
+            color: #fff !important;
+            margin: 0.2rem 0;
+            font-size: 1.55rem;
+        }}
+        .status-genuine p,
+        .status-fraud p {{
             margin: 0.35rem 0 0 0;
-            color: {PRIMARY_TEXT};
+            color: rgba(255, 255, 255, 0.92) !important;
         }}
+
         .metric-card {{
             padding: 1.1rem 1rem;
             text-align: center;
             height: 100%;
         }}
-        .metric-card .icon {{ font-size: 1.3rem; margin-bottom: 0.35rem; }}
+        .metric-card .icon {{ font-size: 1.3rem; margin-bottom: 0.35rem; color: {DEEP_NAVY}; }}
         .metric-card .value {{
             font-size: 1.45rem;
-            font-weight: 700;
-            color: {PRIMARY_TEXT};
+            font-weight: 800;
+            color: {DEEP_NAVY};
         }}
         .metric-card .subtitle {{
-            color: {DARK_NEUTRAL};
+            color: {SLATE_GRAY};
             font-size: 0.82rem;
             margin-top: 0.25rem;
         }}
-        .recommend-card {{
-            background: {LIGHT_BG};
-            border: 1px solid {SECONDARY};
+
+        .risk-meter, .prob-meter {{
+            background: {CARD_BG};
+            border: 1px solid {BORDER};
             border-radius: 16px;
+            padding: 1rem 1.15rem;
+            margin: 0.65rem 0;
+            box-shadow: 0 8px 22px rgba(15, 48, 64, 0.06);
+            animation: fadeIn 0.5s ease both;
+        }}
+        .risk-meter .meter-label,
+        .prob-meter .meter-label {{
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: {DEEP_NAVY};
+            margin-bottom: 0.55rem;
+        }}
+        .risk-meter .track,
+        .prob-meter .track {{
+            height: 12px;
+            border-radius: 999px;
+            background: {GRID};
+            overflow: hidden;
+        }}
+        .risk-meter .fill {{
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, {TERRACOTTA}, #C4876F);
+            animation: fillBar 0.85s ease;
+        }}
+        .prob-meter .fill {{
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, {DEEP_NAVY}, #1A455A);
+            animation: fillBar 0.85s ease;
+        }}
+
+        .recommend-card {{
             padding: 1.1rem 1.25rem;
             margin-top: 1rem;
-            box-shadow: 0 8px 22px rgba(149, 124, 98, 0.08);
         }}
         .recommend-card h4 {{
             margin: 0 0 0.4rem 0;
-            color: {PRIMARY};
+            color: {DEEP_NAVY};
         }}
+
+        /* ---------- Upload ---------- */
         .upload-zone {{
-            background: {LIGHT_BG};
-            border: 2px dashed {SECONDARY};
+            background: {CARD_BG};
+            border: 2px dashed {WARM_SAND};
             border-radius: 20px;
             padding: 2rem 1.5rem;
             text-align: center;
             margin-bottom: 1rem;
-            box-shadow: inset 0 0 0 6px {BACKGROUND};
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }}
+        .upload-zone:hover {{
+            background: #FBF4EF;
+            border-color: {TERRACOTTA};
         }}
         .upload-zone .icon {{ font-size: 2.4rem; }}
-        .upload-zone h3 {{ margin: 0.5rem 0 0.25rem 0; color: {PRIMARY_TEXT}; }}
-        .upload-zone p {{ margin: 0; color: {DARK_NEUTRAL}; }}
+        .upload-zone h3 {{ margin: 0.5rem 0 0.25rem 0; color: {DEEP_NAVY}; }}
+        .upload-zone p {{ margin: 0; color: {SLATE_GRAY}; }}
+
         .chart-card {{
             padding: 1rem 1rem 0.5rem 1rem;
             margin-bottom: 1rem;
         }}
         .chart-card h4 {{
             margin: 0 0 0.5rem 0.25rem;
-            color: {PRIMARY_TEXT};
+            color: {DEEP_NAVY};
             font-size: 1rem;
         }}
+
         .sidebar-brand {{
-            padding: 0.4rem 0.2rem 1rem 0.2rem;
+            padding: 0.5rem 0.2rem 1.1rem 0.2rem;
         }}
         .sidebar-brand .title {{
             font-size: 1.15rem;
-            font-weight: 700;
-            color: {PRIMARY};
+            font-weight: 800;
+            color: #fff !important;
             line-height: 1.3;
         }}
         .sidebar-brand .caption {{
-            color: {DARK_NEUTRAL};
-            font-size: 0.78rem;
-            letter-spacing: 0.06em;
-            margin-bottom: 0.35rem;
+            color: {WARM_SAND} !important;
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
         }}
         .sidebar-meta {{
             margin-top: 1.5rem;
             padding: 1rem;
             border-radius: 14px;
-            background: {BACKGROUND};
-            border: 1px solid {SECONDARY};
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             font-size: 0.82rem;
-            color: {DARK_NEUTRAL};
+            color: rgba(255, 255, 255, 0.8) !important;
             line-height: 1.55;
         }}
-        .sidebar-meta strong {{ color: {PRIMARY_TEXT}; }}
+        .sidebar-meta strong {{ color: #fff !important; }}
+
         .detail-card {{
-            background: {LIGHT_BG};
-            border: 1px solid {SECONDARY};
-            border-radius: 18px;
             padding: 1.35rem 1.4rem;
-            box-shadow: 0 8px 24px rgba(149, 124, 98, 0.08);
             margin-bottom: 1rem;
         }}
+
+        /* ---------- Buttons & inputs ---------- */
         .stButton > button {{
             border-radius: 12px !important;
             font-weight: 600;
             transition: all 0.2s ease;
-            border: 1px solid {SECONDARY};
+            border: 1px solid {BORDER};
+            background: {CARD_BG};
+            color: {DEEP_NAVY};
         }}
         .stButton > button:hover {{
-            transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(183, 116, 102, 0.2);
-            border-color: {PRIMARY};
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 10px 22px rgba(15, 48, 64, 0.16);
+            border-color: {DEEP_NAVY};
         }}
         .stButton > button[kind="primary"] {{
-            background: linear-gradient(135deg, {PRIMARY}, {DARK_NEUTRAL});
-            border: none;
-            color: white;
+            background: {DEEP_NAVY} !important;
+            border: none !important;
+            color: white !important;
         }}
-        /* Demo sample loader button colors (adjacent sibling pattern) */
+        .stButton > button[kind="primary"]:hover {{
+            background: {PRIMARY_HOVER} !important;
+            transform: translateY(-1px) scale(1.02);
+        }}
         div.random-btn + div button {{
-            background: {PRIMARY} !important;
+            background: {DEEP_NAVY} !important;
             color: white !important;
             border: none !important;
             border-radius: 14px !important;
             font-weight: 700 !important;
         }}
         div.genuine-btn + div button {{
-            background: {SUCCESS} !important;
+            background: {TERRACOTTA} !important;
             color: white !important;
             border: none !important;
             border-radius: 14px !important;
             font-weight: 700 !important;
         }}
         div.fraud-btn + div button {{
-            background: {DANGER} !important;
+            background: {DANGER_SOFT} !important;
             color: white !important;
             border: none !important;
             border-radius: 14px !important;
             font-weight: 700 !important;
         }}
+
+        .stTextInput input, .stNumberInput input, .stSelectbox > div > div {{
+            border-radius: 12px !important;
+            border: 1px solid {BORDER} !important;
+        }}
+        .stTextInput input:focus, .stNumberInput input:focus {{
+            border-color: {DEEP_NAVY} !important;
+            box-shadow: 0 0 0 2px rgba(15, 48, 64, 0.15) !important;
+        }}
+
         .sample-meta-card {{
-            background: {LIGHT_BG};
-            border: 1px solid {SECONDARY};
-            border-radius: 18px;
             padding: 1.15rem 1.25rem;
-            box-shadow: 0 8px 22px rgba(149, 124, 98, 0.08);
             margin: 0.85rem 0 1.1rem 0;
         }}
         .sample-meta-grid {{
@@ -413,18 +545,18 @@ def inject_styles():
             gap: 0.85rem;
         }}
         .sample-meta-item .label {{
-            color: {DARK_NEUTRAL};
+            color: {SLATE_GRAY};
             font-size: 0.78rem;
             margin-bottom: 0.2rem;
         }}
         .sample-meta-item .value {{
-            color: {PRIMARY_TEXT};
+            color: {DEEP_NAVY};
             font-weight: 700;
             font-size: 1.02rem;
         }}
         .sample-badge-fraud {{
             display: inline-block;
-            background: {DANGER};
+            background: linear-gradient(135deg, #DC2626, #9F1239);
             color: white;
             border-radius: 999px;
             padding: 0.35rem 0.85rem;
@@ -434,7 +566,7 @@ def inject_styles():
         }}
         .sample-badge-genuine {{
             display: inline-block;
-            background: {SUCCESS};
+            background: linear-gradient(135deg, #16A34A, #15803D);
             color: white;
             border-radius: 999px;
             padding: 0.35rem 0.85rem;
@@ -442,11 +574,29 @@ def inject_styles():
             font-size: 0.88rem;
             margin-bottom: 0.75rem;
         }}
+
         div[data-testid="stFileUploader"] {{
-            background: {LIGHT_BG};
+            background: {CARD_BG};
             border-radius: 16px;
-            padding: 0.75rem;
-            border: 1px solid {SECONDARY};
+            padding: 0.85rem;
+            border: 2px dashed {WARM_SAND};
+            transition: background 0.2s ease;
+        }}
+        div[data-testid="stFileUploader"]:hover {{
+            background: #FBF4EF;
+        }}
+
+        /* Notifications */
+        div[data-testid="stNotification"],
+        .stAlert {{
+            border-radius: 14px !important;
+        }}
+        div[data-baseweb="notification"] {{
+            border-radius: 14px;
+        }}
+
+        [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {{
+            color: rgba(255, 255, 255, 0.85) !important;
         }}
         </style>
         """,
@@ -482,6 +632,11 @@ def _offer_full_dataset_upload(uploader_key):
             _read_csv_cached(file_bytes)
             st.session_state[UPLOAD_BYTES_KEY] = file_bytes
             get_dashboard_score_sample.clear()
+            get_model.clear()
+            # Allow retrain against the newly uploaded dataset if no pickle yet
+            import model as model_module
+
+            model_module._MODEL_CACHE["model"] = None
             st.rerun()
         except Exception as error:
             st.error(f"Could not load dataset: {error}")
@@ -603,12 +758,28 @@ def build_transaction(hour, amount_value, v_features):
     return transaction
 
 
+@st.cache_resource
+def get_model():
+    """
+    Streamlit-cached model accessor.
+
+    Loads fraud_model.pkl when present; otherwise trains a RandomForest on the
+    currently available dataset (full, uploaded, or demo) and caches the result.
+    """
+    df = get_dataset(show_uploader=False)
+    return resolve_model(df=df)
+
+
 def process_batch_dataframe(upload_df):
     missing = [col for col in FEATURE_COLUMNS if col not in upload_df.columns]
     if missing:
         return None, missing
 
-    model = load_saved_model()
+    model = get_model()
+    if model is None:
+        st.warning(MODEL_UNAVAILABLE_MSG)
+        return None, ["__MODEL_UNAVAILABLE__"]
+
     features = upload_df[FEATURE_COLUMNS]
     predictions = model.predict(features)
     fraud_probabilities = model.predict_proba(features)[:, 1]
@@ -659,10 +830,11 @@ def page_header(title, subtitle):
     )
 
 
-def rich_kpi(icon, label, value, description):
+def rich_kpi(icon, label, value, description, variant="default"):
+    variant_class = f" kpi-{variant}" if variant != "default" else ""
     st.markdown(
         f"""
-        <div class="kpi-rich">
+        <div class="kpi-rich{variant_class}">
             <div class="icon">{icon}</div>
             <div class="value">{value}</div>
             <div class="label">{label}</div>
@@ -687,14 +859,16 @@ def metric_card(icon, title, value, subtitle):
 
 
 def style_axes(ax):
-    ax.set_facecolor(LIGHT_BG)
+    ax.set_facecolor(CARD_BG)
     ax.figure.patch.set_facecolor(BACKGROUND)
-    ax.tick_params(colors=PRIMARY_TEXT)
-    ax.xaxis.label.set_color(PRIMARY_TEXT)
-    ax.yaxis.label.set_color(PRIMARY_TEXT)
-    ax.title.set_color(PRIMARY_TEXT)
+    ax.tick_params(colors=SLATE_GRAY)
+    ax.xaxis.label.set_color(DEEP_NAVY)
+    ax.yaxis.label.set_color(DEEP_NAVY)
+    ax.title.set_color(DEEP_NAVY)
+    ax.grid(True, color=GRID, linewidth=0.8, alpha=0.85)
+    ax.set_axisbelow(True)
     for spine in ax.spines.values():
-        spine.set_color(SECONDARY)
+        spine.set_color("#D1D5DB")
 
 
 def chart_fraud_vs_genuine(genuine_count, fraud_count):
@@ -702,7 +876,7 @@ def chart_fraud_vs_genuine(genuine_count, fraud_count):
     ax.bar(
         ["Genuine", "Fraud"],
         [genuine_count, fraud_count],
-        color=[SUCCESS, DANGER],
+        color=[DEEP_NAVY, TERRACOTTA],
         edgecolor="white",
         width=0.55,
     )
@@ -714,7 +888,7 @@ def chart_fraud_vs_genuine(genuine_count, fraud_count):
 
 def chart_amount_distribution(amounts):
     fig, ax = plt.subplots(figsize=(6, 3.8))
-    ax.hist(amounts, bins=40, color=PRIMARY, edgecolor="white")
+    ax.hist(amounts, bins=40, color=DEEP_NAVY, edgecolor="white")
     ax.set_xlabel("Amount")
     ax.set_ylabel("Frequency")
     style_axes(ax)
@@ -724,7 +898,7 @@ def chart_amount_distribution(amounts):
 
 def chart_probability_distribution(probabilities):
     fig, ax = plt.subplots(figsize=(6, 3.8))
-    ax.hist(probabilities, bins=30, color=SECONDARY, edgecolor="white")
+    ax.hist(probabilities, bins=30, color=WARM_SAND, edgecolor="white")
     ax.set_xlabel("Fraud Probability (%)")
     ax.set_ylabel("Frequency")
     style_axes(ax)
@@ -734,7 +908,7 @@ def chart_probability_distribution(probabilities):
 
 def chart_risk_distribution(risk_scores):
     fig, ax = plt.subplots(figsize=(6, 3.8))
-    ax.hist(risk_scores, bins=30, color=DARK_NEUTRAL, edgecolor="white")
+    ax.hist(risk_scores, bins=30, color=TERRACOTTA, edgecolor="white")
     ax.set_xlabel("Risk Score (/100)")
     ax.set_ylabel("Frequency")
     style_axes(ax)
@@ -756,6 +930,9 @@ def home_page():
     st.markdown(
         f"""
         <div class="premium-hero">
+            <div class="orb orb-a"></div>
+            <div class="orb orb-b"></div>
+            <div class="orb orb-c"></div>
             <h1>{PROJECT_TITLE}</h1>
             <p>{PROJECT_SUBTITLE}</p>
         </div>
@@ -792,13 +969,37 @@ def home_page():
     summary = get_dataset_summary(df)
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        rich_kpi("💳", "Total Transactions", f"{summary['num_rows']:,}", "Records in the Kaggle dataset")
+        rich_kpi(
+            "💳",
+            "Total Transactions",
+            f"{summary['num_rows']:,}",
+            "Records in the Kaggle dataset",
+            variant="total",
+        )
     with k2:
-        rich_kpi("⚠", "Fraud Cases", f"{summary['fraudulent_transactions']:,}", "Confirmed fraudulent labels")
+        rich_kpi(
+            "⚠",
+            "Fraud Cases",
+            f"{summary['fraudulent_transactions']:,}",
+            "Confirmed fraudulent labels",
+            variant="fraud",
+        )
     with k3:
-        rich_kpi("🎯", "Model Accuracy", "99.95%", "Random Forest test-set accuracy")
+        rich_kpi(
+            "🎯",
+            "Model Accuracy",
+            "99.95%",
+            "Random Forest test-set accuracy",
+            variant="genuine",
+        )
     with k4:
-        rich_kpi("⚡", "Risk Engine", "Active", "Live scoring with fraud_model.pkl")
+        rich_kpi(
+            "⚡",
+            "Risk Engine",
+            "Active",
+            "Live scoring with fraud_model.pkl",
+            variant="rate",
+        )
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     st.markdown(
@@ -850,13 +1051,27 @@ def render_prediction_results(prediction, fraud_probability, risk_score, confide
     with m4:
         metric_card("🎯", "Confidence", f"{confidence * 100:.2f}%", "Decision confidence")
 
-    st.progress(min(max(confidence, 0.0), 1.0))
+    risk_width = min(max(float(risk_score), 0.0), 100.0)
+    prob_width = min(max(float(fraud_probability) * 100.0, 0.0), 100.0)
+    st.markdown(
+        f"""
+        <div class="risk-meter">
+            <div class="meter-label"><span>Risk Score</span><span>{risk_score} / 100</span></div>
+            <div class="track"><div class="fill" style="width:{risk_width}%;"></div></div>
+        </div>
+        <div class="prob-meter">
+            <div class="meter-label"><span>Fraud Probability</span><span>{fraud_probability * 100:.2f}%</span></div>
+            <div class="track"><div class="fill" style="width:{prob_width}%;"></div></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown(
         f"""
         <div class="recommend-card">
             <h4>Recommended Action</h4>
-            <p style="margin:0; color:{PRIMARY_TEXT};">{recommendation}</p>
+            <p style="margin:0; color:{SECONDARY_TEXT};">{recommendation}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1008,10 +1223,7 @@ def render_demo_prediction():
                 "confidence": confidence,
             }
         except FileNotFoundError:
-            st.error(
-                "Model file `fraud_model.pkl` not found. "
-                "Train once with: `python model.py`"
-            )
+            st.warning(MODEL_UNAVAILABLE_MSG)
         except Exception as error:
             st.error(f"Prediction failed: {error}")
 
@@ -1072,6 +1284,8 @@ def render_batch_analysis(key_prefix="batch"):
             result_df, missing = process_batch_dataframe(upload_df)
 
         if missing:
+            if missing == ["__MODEL_UNAVAILABLE__"]:
+                return
             st.error("Missing required columns:")
             st.write(missing)
             return
@@ -1089,13 +1303,13 @@ def render_batch_analysis(key_prefix="batch"):
 
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        rich_kpi("💳", "Total Transactions", f"{total:,}", "Rows scored in this file")
+        rich_kpi("💳", "Total Transactions", f"{total:,}", "Rows scored in this file", variant="total")
     with k2:
-        rich_kpi("⚠", "Fraud Detected", f"{fraud_n:,}", "Predicted as Fraud")
+        rich_kpi("⚠", "Fraud Detected", f"{fraud_n:,}", "Predicted as Fraud", variant="fraud")
     with k3:
-        rich_kpi("✅", "Genuine Transactions", f"{genuine_n:,}", "Predicted as Genuine")
+        rich_kpi("✅", "Genuine Transactions", f"{genuine_n:,}", "Predicted as Genuine", variant="genuine")
     with k4:
-        rich_kpi("📈", "Fraud Percentage", f"{fraud_pct:.2f}%", "Share of fraud predictions")
+        rich_kpi("📈", "Fraud Percentage", f"{fraud_pct:.2f}%", "Share of fraud predictions", variant="rate")
 
     st.write("")
     st.markdown('<div class="panel-card"><h3>Processed Results</h3>', unsafe_allow_html=True)
@@ -1157,13 +1371,13 @@ def dashboard_page():
 
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        rich_kpi("💳", "Total Transactions", f"{total:,}", "Full dataset volume")
+        rich_kpi("💳", "Total Transactions", f"{total:,}", "Full dataset volume", variant="total")
     with k2:
-        rich_kpi("⚠", "Fraud Transactions", f"{fraud:,}", "Labeled fraud cases")
+        rich_kpi("⚠", "Fraud Transactions", f"{fraud:,}", "Labeled fraud cases", variant="fraud")
     with k3:
-        rich_kpi("✅", "Genuine Transactions", f"{genuine:,}", "Labeled genuine cases")
+        rich_kpi("✅", "Genuine Transactions", f"{genuine:,}", "Labeled genuine cases", variant="genuine")
     with k4:
-        rich_kpi("📈", "Fraud Rate", f"{fraud_rate:.3f}%", "Fraud share of dataset")
+        rich_kpi("📈", "Fraud Rate", f"{fraud_rate:.3f}%", "Fraud share of dataset", variant="rate")
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     scored = get_dashboard_score_sample(df)
@@ -1187,7 +1401,10 @@ def dashboard_page():
                 chart_risk_distribution(scored["Risk Score"]),
             )
     else:
-        st.warning("Could not compute probability charts. Ensure fraud_model.pkl exists.")
+        st.warning(
+            "Could not compute probability charts. "
+            + MODEL_UNAVAILABLE_MSG
+        )
 
     with st.expander("Dataset snapshot"):
         st.dataframe(df.head(10), use_container_width=True)
@@ -1202,31 +1419,31 @@ def about_page():
     st.markdown(
         f"""
         <div class="detail-card">
-            <h3 style="color:{PRIMARY}; margin-top:0;">Project Overview</h3>
-            <p style="color:{PRIMARY_TEXT}; margin-bottom:0;">
+            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Project Overview</h3>
+            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
                 A premium analytics interface for detecting fraudulent credit card
                 transactions with a Random Forest model trained on the Kaggle
                 Credit Card Fraud Detection dataset.
             </p>
         </div>
         <div class="detail-card">
-            <h3 style="color:{PRIMARY}; margin-top:0;">Purpose</h3>
-            <p style="color:{PRIMARY_TEXT}; margin-bottom:0;">
+            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Purpose</h3>
+            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
                 Demonstrate end-to-end fraud intelligence: single-transaction demos,
                 batch CSV scoring, risk recommendations, and an interactive dashboard
                 suitable for internship presentations.
             </p>
         </div>
         <div class="detail-card">
-            <h3 style="color:{PRIMARY}; margin-top:0;">Machine Learning Model</h3>
-            <p style="color:{PRIMARY_TEXT}; margin-bottom:0;">
+            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Machine Learning Model</h3>
+            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
                 Random Forest Classifier loaded from <code>fraud_model.pkl</code>.
                 Predictions return class labels, fraud probability, and risk score.
             </p>
         </div>
         <div class="detail-card">
-            <h3 style="color:{PRIMARY}; margin-top:0;">Dataset</h3>
-            <p style="color:{PRIMARY_TEXT}; margin-bottom:0;">
+            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Dataset</h3>
+            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
                 Kaggle Credit Card Fraud Detection Dataset — anonymized features
                 V1–V28, Time, Amount, and Class labels.
             </p>
@@ -1262,7 +1479,7 @@ def about_page():
     st.markdown(
         f"""
         <div class="detail-card">
-            <h3 style="color:{PRIMARY}; margin-top:0;">Developer Information</h3>
+            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Developer Information</h3>
             <p><strong>Name:</strong> {FULL_NAME}</p>
             <p><strong>Email:</strong> {REGISTERED_EMAIL}</p>
             <p style="margin-bottom:0;"><strong>Project Type:</strong> Internship Project</p>

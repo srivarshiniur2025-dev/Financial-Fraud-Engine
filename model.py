@@ -5,6 +5,8 @@ Train a Random Forest classifier for credit card fraud detection
 and predict whether a transaction is Fraud or Genuine.
 """
 
+from pathlib import Path
+
 import joblib
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -20,6 +22,10 @@ from sklearn.model_selection import train_test_split
 from utils import load_data as load_csv_from_disk
 
 MODEL_PATH = "fraud_model.pkl"
+MODEL_UNAVAILABLE_MSG = (
+    "Model cannot be loaded because neither a trained model nor a training dataset "
+    "is available."
+)
 
 # Exact feature order used during training (all columns except Class)
 FEATURE_COLUMNS = [
@@ -29,6 +35,9 @@ FEATURE_COLUMNS = [
     "V21", "V22", "V23", "V24", "V25", "V26", "V27", "V28",
     "Amount",
 ]
+
+# In-memory cache so auto-training runs at most once per process
+_MODEL_CACHE = {"model": None}
 
 
 def load_data(path=None):
@@ -98,10 +107,88 @@ def save_model(model, path=MODEL_PATH):
     print(f"\nModel saved as {path}")
 
 
+def _warn_model_unavailable():
+    """Show a Streamlit warning when possible; never raise."""
+    try:
+        import streamlit as st
+
+        st.warning(MODEL_UNAVAILABLE_MSG)
+    except Exception:
+        pass
+
+
+def _train_model_from_dataframe(df, path=MODEL_PATH):
+    """Train a RandomForest on df and try to persist fraud_model.pkl."""
+    if df is None or df.empty or "Class" not in df.columns:
+        return None
+    if df["Class"].nunique() < 2:
+        return None
+
+    X, y = split_features_and_target(df)
+    try:
+        X_train, X_test, y_train, y_test = split_train_test(X, y)
+    except ValueError:
+        # Tiny / unbalanced demo sets may not support a stratified split
+        X_train, y_train = X, y
+
+    model = train_random_forest(X_train, y_train)
+    try:
+        save_model(model, path)
+    except OSError as error:
+        # Read-only filesystems (some hosts) — keep the in-memory model
+        print(f"Could not save model to {path}: {error}")
+    return model
+
+
+def get_model(df=None, path=MODEL_PATH):
+    """
+    Load fraud_model.pkl if present; otherwise train a RandomForestClassifier
+    on the provided (or on-disk) dataset, save it, and cache it.
+
+    Returns
+    -------
+    RandomForestClassifier or None
+        None only when neither a pickle nor a usable training dataset exists.
+        Never raises FileNotFoundError for a missing pickle.
+    """
+    if _MODEL_CACHE["model"] is not None:
+        return _MODEL_CACHE["model"]
+
+    model_path = Path(path)
+    if model_path.is_file():
+        try:
+            model = joblib.load(model_path)
+            _MODEL_CACHE["model"] = model
+            print(f"Loaded model from {path}: {type(model)}")
+            return model
+        except Exception as error:
+            print(f"Failed to load {path} ({error}); will retrain if possible.")
+
+    training_df = df
+    if training_df is None:
+        try:
+            training_df = load_csv_from_disk()
+        except FileNotFoundError:
+            training_df = None
+
+    model = _train_model_from_dataframe(training_df, path=path)
+    if model is None:
+        _warn_model_unavailable()
+        return None
+
+    _MODEL_CACHE["model"] = model
+    return model
+
+
 def load_saved_model(path=MODEL_PATH):
-    """Load a previously saved Random Forest model from disk."""
-    model = joblib.load(path)
-    print(f"Loaded model from {path}: {type(model)}")
+    """
+    Load (or auto-train) the Random Forest model.
+
+    Prefer get_model(); this wrapper remains for compatibility.
+    """
+    model = get_model(path=path)
+    if model is None:
+        raise FileNotFoundError(MODEL_UNAVAILABLE_MSG)
     return model
 
 
@@ -145,7 +232,10 @@ def predict_transaction(transaction):
         fraud_probability – probability of fraud (class 1)
         risk_score        – fraud probability scaled to 0–100
     """
-    model = load_saved_model()
+    model = get_model()
+
+    if model is None:
+        raise FileNotFoundError(MODEL_UNAVAILABLE_MSG)
 
     # Safety: must be a trained RandomForest, not a hardcoded value
     if not isinstance(model, RandomForestClassifier):
@@ -196,6 +286,7 @@ def main():
     model = train_random_forest(X_train, y_train)
     evaluate_model(model, X_test, y_test)
     save_model(model)
+    _MODEL_CACHE["model"] = model
 
     # Quick sanity check on a known fraud row
     fraud_row = df[df["Class"] == 1].iloc[0].drop(labels=["Class"])
