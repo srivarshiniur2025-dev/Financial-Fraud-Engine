@@ -1,0 +1,38 @@
+# Dataset (too large for GitHub — download from Kaggle)
+creditcard.csv
+data/creditcard.csv
+**/creditcard.csv
+
+# Trained model artifacts (generate locally with: python model.py)
+*.pkl
+fraud_model.joblib
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Streamlit
+.streamlit/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Jupyter / notebooks checkpoints
+.ipynb_checkpoints/
+
+# Logs and local root-level plot exports
+*.log
+/*.png
