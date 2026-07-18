@@ -1,0 +1,29 @@
+# Vercel Container entrypoint for Streamlit
+# Docs: https://vercel.com/docs/functions/container-images
+#
+# Vercel serves this image as a Function and routes traffic to $PORT (default 80).
+# This is the reliable way to host Streamlit on Vercel without converting to Flask/FastAPI.
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
+    STREAMLIT_SERVER_HEADLESS=true
+
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY app.py model.py utils.py ./
+COPY api ./api
+COPY data ./data
+
+# Default Vercel container port
+ENV PORT=80
+EXPOSE 80
+
+# Launch the existing Streamlit UI from app.py (ML/UI unchanged)
+CMD ["sh", "-c", "streamlit run app.py --server.port=${PORT:-80} --server.address=0.0.0.0 --server.headless=true --browser.gatherUsageStats=false"]

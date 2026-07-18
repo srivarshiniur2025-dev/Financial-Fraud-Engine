@@ -155,14 +155,53 @@ Then open the local URL shown in the terminal (usually [http://localhost:8501](h
 
 ---
 
+## Deploying on Vercel
+
+This project includes Vercel configuration so root `app.py` is **not** treated as a FastAPI/Flask app (which caused the missing `app` / `application` / `handler` export error).
+
+### Files used for Vercel
+
+| File | Purpose |
+|---|---|
+| `vercel.json` | Routes deployment through `api/index.py` instead of scanning Streamlit `app.py` as a WSGI/ASGI app |
+| `api/index.py` | Vercel Python entrypoint (`handler`) that launches Streamlit from `app.py` |
+| `Dockerfile.vercel` | **Recommended** container image that runs `streamlit run app.py` on `$PORT` |
+| `runtime.txt` | Pins Python 3.12 for the Python runtime |
+| `pyproject.toml` | Sets `tool.vercel.entrypoint = "api.index:handler"` so Vercel ignores root `app.py` as the framework entry |
+| `.vercelignore` | Keeps large/local files out of the upload |
+
+### Recommended: container deploy (full Streamlit UI)
+
+Vercel can host Streamlit through **`Dockerfile.vercel`** (container Functions). The container listens on `$PORT` (default `80`) and starts the existing Streamlit app.
+
+1. Push this repository to GitHub.
+2. Import the project in [Vercel](https://vercel.com).
+3. Deploy (Vercel detects `Dockerfile.vercel`).
+4. Ensure `data/creditcard.csv` and `fraud_model.pkl` are available in the deployment environment (upload via build pipeline, private asset store, or bake into the image carefully — the CSV is large and is gitignored by default).
+
+### About the previous error
+
+> Found app.py but it does not export a top-level "app", "application", or "handler"
+
+Vercel’s Python runtime looked at root `app.py` and expected a FastAPI/Flask export. Streamlit apps do not use that pattern. This repo keeps Streamlit `app.py` unchanged and moves the Vercel entrypoint to `api/index.py` + optional `Dockerfile.vercel`.
+
+---
+
 ## Project Structure
 
 ```text
 Financial-Fraud-Engine/
-├── app.py                 # Streamlit UI (fintech dashboard)
+├── app.py                 # Streamlit UI (unchanged ML/UI logic)
 ├── model.py               # Train / save / load / predict (Random Forest)
 ├── utils.py               # Data helpers, summary stats, chart helpers, risk score
+├── api/
+│   └── index.py           # Vercel Python entrypoint (launches Streamlit)
 ├── requirements.txt       # Python dependencies
+├── runtime.txt            # Python version for Vercel
+├── vercel.json            # Vercel routing / function config
+├── Dockerfile.vercel      # Container image for full Streamlit on Vercel
+├── pyproject.toml         # Points Vercel entrypoint to api.index:handler
+├── .vercelignore          # Files excluded from Vercel uploads
 ├── README.md              # Project documentation
 ├── LICENSE                # MIT License
 ├── .gitignore             # Ignores dataset, venv, caches, model artifacts

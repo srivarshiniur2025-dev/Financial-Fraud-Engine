@@ -1,0 +1,9 @@
+[project]
+name = "financial-fraud-intelligence-engine"
+version = "1.0.0"
+description = "Streamlit fraud detection engine"
+requires-python = ">=3.10"
+
+# Point Vercel at api/index.py so root app.py is NOT treated as FastAPI/Flask
+[tool.vercel]
+entrypoint = "api.index:handler"
