@@ -2,6 +2,7 @@
 creditcard.csv
 data/creditcard.csv
 **/creditcard.csv
+!data/demo_creditcard.csv
 
 # Trained model artifacts (generate locally with: python model.py)
 *.pkl

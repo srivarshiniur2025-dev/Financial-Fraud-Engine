@@ -12,15 +12,17 @@ import pandas as pd
 
 DATA_PATH = "data/creditcard.csv"
 ROOT_DATA_PATH = "creditcard.csv"
+DEMO_DATA_PATH = "data/demo_creditcard.csv"
 
 
-def resolve_dataset_path():
+def resolve_dataset_path(include_demo=True):
     """
     Locate the credit-card CSV on disk.
 
     Checks, in order:
-    1. data/creditcard.csv
+    1. data/creditcard.csv (full dataset)
     2. creditcard.csv (project root)
+    3. data/demo_creditcard.csv (bundled demo, if include_demo)
 
     Returns
     -------
@@ -31,6 +33,8 @@ def resolve_dataset_path():
         return DATA_PATH
     if Path(ROOT_DATA_PATH).is_file():
         return ROOT_DATA_PATH
+    if include_demo and Path(DEMO_DATA_PATH).is_file():
+        return DEMO_DATA_PATH
     return None
 
 
@@ -38,22 +42,17 @@ def load_data(path=None):
     """
     Load the credit card dataset from disk (CLI / training use).
 
-    Parameters
-    ----------
-    path : str, optional
-        Explicit CSV path. If omitted or missing, uses resolve_dataset_path().
-
-    Returns
-    -------
-    pandas.DataFrame
+    Prefers the full dataset; falls back to the demo CSV when needed.
+    Never raises FileNotFoundError when the demo file is present.
     """
     if path is not None and Path(path).is_file():
         return pd.read_csv(path)
 
-    resolved = resolve_dataset_path()
+    resolved = resolve_dataset_path(include_demo=True)
     if resolved is None:
         raise FileNotFoundError(
-            f"Dataset not found. Place the file at '{DATA_PATH}' or '{ROOT_DATA_PATH}'."
+            f"Dataset not found. Place the file at '{DATA_PATH}', "
+            f"'{ROOT_DATA_PATH}', or '{DEMO_DATA_PATH}'."
         )
     return pd.read_csv(resolved)
 

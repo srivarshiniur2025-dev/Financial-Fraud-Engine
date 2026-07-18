@@ -8,16 +8,22 @@ Run with: streamlit run app.py
 
 import io
 from datetime import datetime
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 
 from model import load_saved_model, predict_transaction
-from utils import calculate_risk_score, get_dataset_summary, resolve_dataset_path
+from utils import (
+    DEMO_DATA_PATH,
+    DATA_PATH,
+    calculate_risk_score,
+    get_dataset_summary,
+)
 
-DATASET_MISSING_MSG = (
-    "Dataset not found.\nPlease upload creditcard.csv using the uploader below."
+DEMO_DATASET_BANNER = (
+    "Demo dataset loaded. Upload the full Kaggle dataset for complete analysis."
 )
 UPLOAD_BYTES_KEY = "creditcard_upload_bytes"
 
@@ -463,41 +469,53 @@ def _read_csv_from_path(path: str):
     return pd.read_csv(path)
 
 
+def _offer_full_dataset_upload(uploader_key):
+    """Optional uploader to replace the demo/full disk dataset for this session."""
+    uploaded = st.file_uploader(
+        "Upload full creditcard.csv (optional)",
+        type=["csv"],
+        key=uploader_key,
+    )
+    if uploaded is not None:
+        try:
+            file_bytes = uploaded.getvalue()
+            _read_csv_cached(file_bytes)
+            st.session_state[UPLOAD_BYTES_KEY] = file_bytes
+            get_dashboard_score_sample.clear()
+            st.rerun()
+        except Exception as error:
+            st.error(f"Could not load dataset: {error}")
+
+
 def get_dataset(show_uploader=True, uploader_key="dataset_uploader"):
     """
-    Return the credit-card fraud dataset, or None if it is unavailable.
+    Return the credit-card fraud dataset, or None if nothing is available.
 
-    Resolution order:
-    1. CSV previously uploaded in this session (bytes cached via @st.cache_data)
-    2. data/creditcard.csv on disk
-    3. creditcard.csv in the project root
-    4. If still missing: show a Streamlit warning + file uploader (no crash)
+    Priority:
+    1. Uploaded creditcard.csv (session, cached via @st.cache_data)
+    2. data/creditcard.csv if present
+    3. data/demo_creditcard.csv (bundled demo — always preferred over crashing)
+
+    Never raises FileNotFoundError.
     """
     uploaded_bytes = st.session_state.get(UPLOAD_BYTES_KEY)
     if uploaded_bytes:
         return _read_csv_cached(uploaded_bytes)
 
-    disk_path = resolve_dataset_path()
-    if disk_path is not None:
-        return _read_csv_from_path(disk_path)
+    if Path(DATA_PATH).is_file():
+        return _read_csv_from_path(DATA_PATH)
+
+    if Path(DEMO_DATA_PATH).is_file():
+        if show_uploader:
+            st.info(DEMO_DATASET_BANNER)
+            _offer_full_dataset_upload(uploader_key)
+        return _read_csv_from_path(DEMO_DATA_PATH)
 
     if show_uploader:
-        st.warning(DATASET_MISSING_MSG)
-        uploaded = st.file_uploader(
-            "Upload creditcard.csv",
-            type=["csv"],
-            key=uploader_key,
+        st.warning(
+            "Dataset not found.\nPlease upload creditcard.csv using the uploader below."
         )
-        if uploaded is not None:
-            try:
-                file_bytes = uploaded.getvalue()
-                # Warm the cache immediately, then persist bytes for later calls.
-                _read_csv_cached(file_bytes)
-                st.session_state[UPLOAD_BYTES_KEY] = file_bytes
-                get_dashboard_score_sample.clear()
-                st.rerun()
-            except Exception as error:
-                st.error(f"Could not load dataset: {error}")
+        _offer_full_dataset_upload(uploader_key)
 
     return None
 
