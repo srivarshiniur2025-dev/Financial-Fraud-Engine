@@ -3,9 +3,9 @@
 venv/
 __pycache__/
 .git/
-.streamlit/
 data/creditcard.csv
 *.pkl
 *.pyc
 .DS_Store
 screenshots/*.png
+main.py

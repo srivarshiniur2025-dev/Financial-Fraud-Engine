@@ -4,7 +4,6 @@ version = "1.0.0"
 description = "Streamlit fraud detection engine"
 requires-python = ">=3.11"
 
-# Dependencies come from requirements.txt only (avoids duplicate/conflicting sources).
-# Point Vercel at api/index.py so root Streamlit app.py is not treated as FastAPI/Flask.
-[tool.vercel]
-entrypoint = "api.index:handler"
+# Dependencies are installed from requirements.txt / Dockerfile.vercel.
+# Do not set tool.vercel.entrypoint to api.index — that forces the
+# serverless text handler instead of the Streamlit container UI.

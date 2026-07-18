@@ -1,8 +1,8 @@
-# Vercel Container entrypoint for Streamlit
-# Docs: https://vercel.com/docs/functions/container-images
+# Vercel Container deployment for Streamlit
+# https://vercel.com/docs/functions/container-images
 #
-# Vercel serves this image as a Function and routes traffic to $PORT (default 80).
-# This is the reliable way to host Streamlit on Vercel without converting to Flask/FastAPI.
+# Vercel detects Dockerfile.vercel, builds this image, and routes ALL
+# traffic to it. The app must listen on $PORT (default 80).
 
 FROM python:3.12-slim
 
@@ -12,18 +12,21 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
-    STREAMLIT_SERVER_HEADLESS=true
+    STREAMLIT_SERVER_HEADLESS=true \
+    STREAMLIT_SERVER_ENABLE_CORS=false \
+    STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
 
 COPY requirements.txt .
-RUN python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+RUN python -m pip install --upgrade pip \
+    && python -m pip install -r requirements.txt
 
+# Application code (ML + Streamlit UI unchanged)
 COPY app.py model.py utils.py ./
-COPY api ./api
+COPY .streamlit ./.streamlit
 COPY data ./data
 
-# Default Vercel container port
+# Vercel containers serve HTTP on $PORT (defaults to 80)
 ENV PORT=80
 EXPOSE 80
 
-# Launch the existing Streamlit UI from app.py (ML/UI unchanged)
-CMD ["sh", "-c", "streamlit run app.py --server.port=${PORT:-80} --server.address=0.0.0.0 --server.headless=true --browser.gatherUsageStats=false"]
+CMD ["sh", "-c", "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false --server.enableXsrfProtection=false --browser.gatherUsageStats=false"]

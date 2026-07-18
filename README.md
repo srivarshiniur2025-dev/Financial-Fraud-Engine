@@ -157,33 +157,36 @@ Then open the local URL shown in the terminal (usually [http://localhost:8501](h
 
 ## Deploying on Vercel
 
-This project includes Vercel configuration so root `app.py` is **not** treated as a FastAPI/Flask app (which caused the missing `app` / `application` / `handler` export error).
+### Why you previously saw plain text
 
-### Files used for Vercel
+`api/index.py` is a **serverless** handler. It only printed:
 
-| File | Purpose |
+> Streamlit is starting from app.py via api/index.py...
+
+Serverless Functions cannot host Streamlit’s WebSocket UI. The browser never
+received the real Streamlit interface.
+
+### Current approach: Docker container
+
+This project deploys Streamlit with **`Dockerfile.vercel`**.
+
+| File | Role |
 |---|---|
-| `vercel.json` | Routes deployment through `api/index.py` instead of scanning Streamlit `app.py` as a WSGI/ASGI app |
-| `api/index.py` | Vercel Python entrypoint (`handler`) that launches Streamlit from `app.py` |
-| `Dockerfile.vercel` | **Recommended** container image that runs `streamlit run app.py` on `$PORT` |
-| `runtime.txt` | Pins Python 3.12 for the Python runtime |
-| `pyproject.toml` | Sets `tool.vercel.entrypoint = "api.index:handler"` so Vercel ignores root `app.py` as the framework entry |
-| `.vercelignore` | Keeps large/local files out of the upload |
+| `Dockerfile.vercel` | Builds a container that runs `streamlit run app.py` on `$PORT` |
+| `vercel.json` | Disables wrong framework detection; does **not** route to `/api` |
+| `.streamlit/config.toml` | Headless / CORS settings for reverse-proxy hosting |
 
-### Recommended: container deploy (full Streamlit UI)
+### Deploy steps
 
-Vercel can host Streamlit through **`Dockerfile.vercel`** (container Functions). The container listens on `$PORT` (default `80`) and starts the existing Streamlit app.
+1. Push to GitHub.
+2. Import/redeploy the project in [Vercel](https://vercel.com).
+3. Confirm Vercel detects **Dockerfile / container** (not only Python serverless).
+4. Add `data/creditcard.csv` and `fraud_model.pkl` into the deploy environment (or bake them into the image) — both are gitignored by default.
 
-1. Push this repository to GitHub.
-2. Import the project in [Vercel](https://vercel.com).
-3. Deploy (Vercel detects `Dockerfile.vercel`).
-4. Ensure `data/creditcard.csv` and `fraud_model.pkl` are available in the deployment environment (upload via build pipeline, private asset store, or bake into the image carefully — the CSV is large and is gitignored by default).
+### About the previous FastAPI/Flask error
 
-### About the previous error
-
-> Found app.py but it does not export a top-level "app", "application", or "handler"
-
-Vercel’s Python runtime looked at root `app.py` and expected a FastAPI/Flask export. Streamlit apps do not use that pattern. This repo keeps Streamlit `app.py` unchanged and moves the Vercel entrypoint to `api/index.py` + optional `Dockerfile.vercel`.
+Root `app.py` is Streamlit, not FastAPI. Container mode avoids expecting an
+`app` / `application` / `handler` export from that file.
 
 ---
 

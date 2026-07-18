@@ -20,8 +20,9 @@ venv/
 env/
 ENV/
 
-# Streamlit
-.streamlit/
+# Streamlit local secrets / cache (keep committed config.toml)
+.streamlit/*
+!.streamlit/config.toml
 
 # OS / editor
 .DS_Store
