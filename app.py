@@ -44,35 +44,43 @@ PROJECT_SUBTITLE = (
     "AI-powered fraud detection and transaction risk intelligence using Machine Learning."
 )
 
-# Premium fintech palette
-DEEP_NAVY = "#0F3040"
-SLATE_GRAY = "#464858"
-TERRACOTTA = "#A56F63"
-WARM_SAND = "#D99B7F"
-PRIMARY = DEEP_NAVY
-PRIMARY_HOVER = "#173C50"
-SECONDARY = TERRACOTTA
+# ColorHunt palette (light mode): https://colorhunt.co/palette/3e3232503c3c7e6363a87c7c
+INK = "#3E3232"
+GRAPHITE = "#503C3C"
+TEAL = "#7E6363"
+MIST = "#F7F4F4"
+
+DEEP_NAVY = INK
+SLATE_GRAY = GRAPHITE
+TERRACOTTA = TEAL
+WARM_SAND = "#A87C7C"
+PRIMARY = INK
+PRIMARY_HOVER = GRAPHITE
+SECONDARY = TEAL
 ACCENT = WARM_SAND
-BACKGROUND = "#F8F9FA"
+BACKGROUND = MIST
 CARD_BG = "#FFFFFF"
-BORDER = "rgba(15, 48, 64, 0.12)"
-PRIMARY_TEXT = DEEP_NAVY
-SECONDARY_TEXT = SLATE_GRAY
+BORDER = "rgba(62, 50, 50, 0.14)"
+PRIMARY_TEXT = INK
+SECONDARY_TEXT = GRAPHITE
 SUCCESS = "#16A34A"
 SUCCESS_SOFT = "#15803D"
 DANGER = "#DC2626"
-DANGER_SOFT = "#E11D48"
-INFO = "#E8EEF2"
-GRID = "#E5E7EB"
+DANGER_SOFT = "#B91C1C"
+INFO = "#F0EAEA"
+GRID = "#E8E0E0"
 LIGHT_BG = CARD_BG
-DARK_NEUTRAL = SLATE_GRAY
+DARK_NEUTRAL = GRAPHITE
+SURFACE_ELEVATED = "#F5EEEE"
+HERO_START = INK
+HERO_END = GRAPHITE
 
 PAGES = [
-    "🏠 Home",
-    "🔍 Fraud Detection",
-    "📂 Batch Analysis",
-    "📊 Dashboard",
-    "ℹ About",
+    "Home",
+    "Fraud Detection",
+    "Batch Analysis",
+    "Dashboard",
+    "About",
 ]
 
 st.set_page_config(
@@ -104,48 +112,230 @@ def inject_styles():
             background: {BACKGROUND};
             color: {SECONDARY_TEXT};
         }}
+        .stApp, .stApp [data-testid="stAppViewContainer"] {{
+            background: {BACKGROUND} !important;
+        }}
+        [data-testid="stHeader"] {{
+            background: rgba(247, 244, 244, 0.9) !important;
+        }}
         .block-container {{
             padding-top: 1.75rem;
             padding-bottom: 2.5rem;
             max-width: 1200px;
         }}
+        h1, h2, h3, h4 {{
+            color: {PRIMARY_TEXT} !important;
+        }}
+        p, label, .stMarkdown, .stCaption, span {{
+            color: {SECONDARY_TEXT};
+        }}
+        [data-testid="stMetricValue"], [data-testid="stWidgetLabel"] label {{
+            color: {PRIMARY_TEXT} !important;
+        }}
+        div[data-testid="stDataFrame"],
+        div[data-testid="stTable"] {{
+            background: {CARD_BG};
+            border: 1px solid {BORDER};
+            border-radius: 14px;
+        }}
+        .stExpander {{
+            background: {CARD_BG};
+            border: 1px solid {BORDER};
+            border-radius: 14px;
+        }}
+        hr {{
+            border-color: {BORDER} !important;
+        }}
 
-        /* ---------- Sidebar ---------- */
+        /* ---------- Sidebar / Professional Nav ---------- */
         [data-testid="stSidebar"] {{
-            background: {DEEP_NAVY} !important;
-            border-right: none;
+            background: {INK} !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+        }}
+        [data-testid="stSidebar"] > div:first-child {{
+            padding-top: 1.25rem;
+            padding-left: 0.85rem;
+            padding-right: 0.85rem;
         }}
         [data-testid="stSidebar"] * {{
-            color: rgba(255, 255, 255, 0.92);
+            color: rgba(255, 255, 255, 0.88);
         }}
+        section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {{
+            color: rgba(255, 255, 255, 0.78) !important;
+        }}
+
+        .sidebar-brand {{
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.35rem 0.35rem 1.35rem 0.35rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 1.15rem;
+        }}
+        .sidebar-brand .logo-mark {{
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: {WARM_SAND};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #fff !important;
+            flex-shrink: 0;
+        }}
+        .sidebar-brand .brand-copy {{
+            min-width: 0;
+        }}
+        .sidebar-brand .caption {{
+            color: {WARM_SAND} !important;
+            font-size: 0.65rem;
+            letter-spacing: 0.14em;
+            margin: 0 0 0.2rem 0;
+            font-weight: 700;
+            text-transform: uppercase;
+        }}
+        .sidebar-brand .title {{
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #fff !important;
+            line-height: 1.25;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }}
+
+        .nav-section-label {{
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.42) !important;
+            margin: 0 0 0.55rem 0.45rem;
+        }}
+
         [data-testid="stSidebar"] .stRadio > div {{
-            gap: 0.4rem;
+            gap: 0.3rem;
         }}
         [data-testid="stSidebar"] .stRadio label {{
             background: transparent;
             border: 1px solid transparent;
-            border-radius: 12px;
-            padding: 0.7rem 0.9rem !important;
-            transition: all 0.2s ease;
-            color: #fff !important;
+            border-radius: 10px;
+            padding: 0.72rem 0.9rem 0.72rem 0.85rem !important;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            color: rgba(255, 255, 255, 0.82) !important;
+            position: relative;
         }}
         [data-testid="stSidebar"] .stRadio label:hover {{
-            background: rgba(255, 255, 255, 0.12) !important;
-            transform: translateX(2px);
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.06) !important;
         }}
         [data-testid="stSidebar"] .stRadio label p,
         [data-testid="stSidebar"] .stRadio label span {{
-            color: #fff !important;
+            color: rgba(255, 255, 255, 0.86) !important;
+            font-size: 0.92rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.01em;
+        }}
+        /* Hide default radio circles for a cleaner nav look */
+        [data-testid="stSidebar"] .stRadio label > div:first-child {{
+            display: none !important;
         }}
         div[role="radiogroup"] label:has(input:checked) {{
-            background: {WARM_SAND} !important;
-            border: 1px solid {WARM_SAND} !important;
-            box-shadow: 0 8px 20px rgba(217, 155, 127, 0.35);
+            background: rgba(168, 124, 124, 0.16) !important;
+            border: 1px solid rgba(168, 124, 124, 0.4) !important;
+            box-shadow: inset 3px 0 0 {WARM_SAND};
         }}
         div[role="radiogroup"] label:has(input:checked) p,
         div[role="radiogroup"] label:has(input:checked) span {{
-            color: {DEEP_NAVY} !important;
+            color: #fff !important;
             font-weight: 700 !important;
+        }}
+
+        .sidebar-meta {{
+            margin-top: 1.75rem;
+            padding: 0.95rem 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.7) !important;
+            line-height: 1.5;
+        }}
+        .sidebar-meta .meta-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.42rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }}
+        .sidebar-meta .meta-row:last-child {{
+            border-bottom: none;
+            padding-bottom: 0;
+        }}
+        .sidebar-meta .meta-row:first-child {{
+            padding-top: 0;
+        }}
+        .sidebar-meta .meta-key {{
+            color: rgba(255, 255, 255, 0.42) !important;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 0.66rem;
+        }}
+        .sidebar-meta .meta-val {{
+            color: #fff !important;
+            font-weight: 600;
+            text-align: right;
+        }}
+        .sidebar-meta .status-pill {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(168, 124, 124, 0.18);
+            color: {WARM_SAND} !important;
+            border: 1px solid rgba(168, 124, 124, 0.35);
+            border-radius: 999px;
+            padding: 0.18rem 0.55rem;
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }}
+        .sidebar-meta .status-dot {{
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: {WARM_SAND};
+        }}
+        .sidebar-footer {{
+            margin-top: 0.85rem;
+            padding: 0 0.35rem;
+            font-size: 0.66rem;
+            color: rgba(255, 255, 255, 0.32) !important;
+            letter-spacing: 0.04em;
+        }}
+
+        .section-label {{
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: {TEAL} !important;
+            margin: 0.15rem 0 0.4rem 0;
+        }}
+        .section-title {{
+            font-size: 1.3rem;
+            font-weight: 750;
+            color: {INK} !important;
+            margin: 0 0 0.3rem 0;
+            letter-spacing: -0.02em;
+        }}
+        .section-desc {{
+            color: {GRAPHITE} !important;
+            font-size: 0.94rem;
+            margin: 0 0 1.1rem 0;
+            line-height: 1.5;
         }}
 
         h1, h2, h3, h4 {{
@@ -159,93 +349,125 @@ def inject_styles():
 
         /* ---------- Hero ---------- */
         .premium-hero {{
-            background: linear-gradient(145deg, {DEEP_NAVY} 0%, {SLATE_GRAY} 100%);
-            border-radius: 24px;
-            padding: 2.85rem 2.4rem;
-            box-shadow: 0 18px 44px rgba(15, 48, 64, 0.28);
+            background: {INK};
+            border-radius: 20px;
+            padding: 2.4rem 2.5rem 2.2rem 2.5rem;
+            box-shadow: 0 12px 32px rgba(62, 50, 50, 0.14);
+            border: 1px solid rgba(62, 50, 50, 0.2);
             margin-bottom: 1.85rem;
             position: relative;
             overflow: hidden;
-            animation: fadeIn 0.55s ease both;
+            animation: fadeIn 0.45s ease both;
         }}
-        .premium-hero .orb {{
+        .premium-hero::before {{
+            content: "";
             position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: {WARM_SAND};
         }}
-        .premium-hero .orb-a {{
-            width: 200px;
-            height: 200px;
-            right: -48px;
-            top: -56px;
-            background: radial-gradient(circle, {TERRACOTTA}88 0%, transparent 70%);
+        .premium-hero .hero-content {{
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+            padding-left: 0.35rem;
         }}
-        .premium-hero .orb-b {{
-            width: 140px;
-            height: 140px;
-            right: 90px;
-            bottom: -50px;
-            background: radial-gradient(circle, {WARM_SAND}77 0%, transparent 70%);
+        .premium-hero .hero-eyebrow {{
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: {WARM_SAND} !important;
+            margin-bottom: 0.9rem;
         }}
-        .premium-hero .orb-c {{
-            width: 90px;
-            height: 90px;
-            left: 8%;
-            bottom: -30px;
-            background: radial-gradient(circle, {TERRACOTTA}55 0%, transparent 70%);
-        }}
-        .premium-hero h1 {{
-            color: #fff !important;
-            font-size: 2.5rem;
+        .premium-hero .hero-title,
+        .premium-hero h1.hero-title,
+        div[data-testid="stMarkdownContainer"] .premium-hero .hero-title,
+        div[data-testid="stMarkdownContainer"] .premium-hero h1 {{
+            color: #FFFFFF !important;
+            font-size: clamp(1.9rem, 3vw, 2.45rem);
             font-weight: 800;
-            margin: 0 0 0.65rem 0;
-            position: relative;
-            z-index: 1;
+            margin: 0 0 0.7rem 0;
             letter-spacing: -0.03em;
+            line-height: 1.18;
         }}
-        .premium-hero p {{
-            color: rgba(255, 255, 255, 0.88) !important;
-            font-size: 1.12rem;
-            margin: 0;
-            max-width: 720px;
-            position: relative;
-            z-index: 1;
-            line-height: 1.55;
+        .premium-hero .hero-subtitle,
+        .premium-hero p.hero-subtitle,
+        div[data-testid="stMarkdownContainer"] .premium-hero p {{
+            color: rgba(255, 255, 255, 0.82) !important;
+            font-size: 1.02rem;
+            margin: 0 0 1.25rem 0;
+            max-width: 620px;
+            line-height: 1.6;
             font-weight: 400;
+        }}
+        .premium-hero .hero-meta {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }}
+        .premium-hero .hero-chip {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.38rem 0.72rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.92) !important;
+            font-size: 0.76rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }}
+        .premium-hero .hero-chip .dot {{
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: {WARM_SAND};
         }}
 
         /* ---------- Cards ---------- */
         .feature-card, .kpi-rich, .metric-card, .panel-card, .chart-card,
         .info-card, .detail-card, .sample-meta-card, .recommend-card {{
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(10px);
+            background: {CARD_BG};
             border: 1px solid {BORDER};
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(15, 48, 64, 0.08);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            animation: fadeIn 0.5s ease both;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(62, 50, 50, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            animation: fadeIn 0.45s ease both;
         }}
         .feature-card:hover, .kpi-rich:hover, .metric-card:hover,
         .panel-card:hover, .chart-card:hover, .detail-card:hover {{
-            transform: translateY(-4px);
-            box-shadow: 0 16px 40px rgba(15, 48, 64, 0.14);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(62, 50, 50, 0.1);
+            border-color: rgba(168, 124, 124, 0.3);
         }}
         .feature-card {{
-            padding: 1.4rem 1.25rem;
-            min-height: 150px;
+            padding: 1.35rem 1.2rem;
+            min-height: 148px;
             height: 100%;
         }}
-        .feature-card .icon {{ font-size: 1.55rem; margin-bottom: 0.55rem; }}
+        .feature-card .icon {{
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: {WARM_SAND} !important;
+            margin-bottom: 0.65rem;
+        }}
         .feature-card h4 {{
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             margin: 0 0 0.4rem 0;
-            font-size: 1.05rem;
+            font-size: 1.02rem;
+            font-weight: 700;
         }}
         .feature-card p {{
-            color: {SLATE_GRAY};
+            color: {SECONDARY_TEXT};
             margin: 0;
-            font-size: 0.92rem;
-            line-height: 1.45;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }}
 
         /* ---------- Metric / KPI cards ---------- */
@@ -254,54 +476,87 @@ def inject_styles():
             text-align: left;
             height: 100%;
         }}
-        .kpi-rich .icon {{ font-size: 1.35rem; margin-bottom: 0.45rem; color: {DEEP_NAVY}; }}
+        .kpi-rich .icon {{
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.55rem;
+            color: {TEAL};
+        }}
         .kpi-rich .value {{
             font-size: 1.7rem;
             font-weight: 800;
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             line-height: 1.2;
         }}
         .kpi-rich .label {{
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             font-weight: 600;
             font-size: 0.95rem;
             margin-top: 0.2rem;
         }}
         .kpi-rich .desc {{
-            color: {SLATE_GRAY};
+            color: {SECONDARY_TEXT};
             font-size: 0.82rem;
             margin-top: 0.35rem;
         }}
-        .kpi-rich.kpi-total .icon {{ color: {DEEP_NAVY}; }}
+        .kpi-rich.kpi-total .icon {{ color: {INK}; }}
         .kpi-rich.kpi-fraud .icon,
-        .kpi-rich.kpi-fraud .value {{ color: {TERRACOTTA}; }}
+        .kpi-rich.kpi-fraud .value {{ color: {TEAL}; }}
         .kpi-rich.kpi-genuine .icon,
         .kpi-rich.kpi-genuine .value {{ color: {SUCCESS}; }}
         .kpi-rich.kpi-rate .icon,
         .kpi-rich.kpi-rate .value {{ color: {WARM_SAND}; }}
 
-        .page-header h1 {{
-            font-size: 2rem;
+        .page-header {{
             margin-bottom: 0.35rem;
-            color: {DEEP_NAVY};
+        }}
+        .page-header h1 {{
+            font-size: 1.85rem;
+            margin-bottom: 0.35rem;
+            color: {PRIMARY_TEXT};
+            letter-spacing: -0.02em;
         }}
         .page-header p {{
-            color: {SLATE_GRAY};
+            color: {SECONDARY_TEXT};
             margin: 0 0 1.25rem 0;
-            font-size: 1.02rem;
+            font-size: 1rem;
+            line-height: 1.5;
         }}
         .section-divider {{
             height: 1px;
-            background: linear-gradient(90deg, {BORDER}, transparent);
+            background: {BORDER};
             margin: 1.5rem 0;
             border: none;
         }}
         .info-card {{
-            padding: 1rem 1.2rem;
-            border-left: 5px solid {DEEP_NAVY};
-            background: linear-gradient(90deg, {INFO}, {CARD_BG});
+            padding: 1rem 1.25rem;
+            border-left: 4px solid {WARM_SAND};
+            background: {INFO};
+            border: 1px solid {BORDER};
+            border-left: 4px solid {WARM_SAND};
+            border-radius: 12px;
             color: {SECONDARY_TEXT};
             margin: 0.75rem 0 1.1rem 0;
+            font-size: 0.94rem;
+            line-height: 1.55;
+        }}
+        .mode-row {{
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }}
+        .tech-pill {{
+            display: inline-flex;
+            align-items: center;
+            padding: 0.55rem 0.95rem;
+            background: {CARD_BG};
+            border: 1px solid {BORDER};
+            border-radius: 10px;
+            color: {INK} !important;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0.25rem 0.35rem 0.25rem 0;
         }}
         .panel-card {{
             padding: 1.35rem 1.35rem 1.1rem 1.35rem;
@@ -309,26 +564,26 @@ def inject_styles():
         }}
         .panel-card h3 {{
             margin: 0 0 0.85rem 0;
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             font-size: 1.15rem;
         }}
 
         /* ---------- Prediction status ---------- */
         .status-genuine {{
-            background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+            background: {SUCCESS};
             border: none;
-            border-radius: 18px;
-            padding: 1.45rem 1.5rem;
-            box-shadow: 0 14px 34px rgba(22, 163, 74, 0.28);
+            border-radius: 16px;
+            padding: 1.35rem 1.4rem;
+            box-shadow: 0 10px 24px rgba(22, 163, 74, 0.18);
             color: #fff;
             animation: fadeIn 0.45s ease both;
         }}
         .status-fraud {{
-            background: linear-gradient(135deg, #DC2626 0%, #9F1239 100%);
+            background: {DANGER};
             border: none;
-            border-radius: 18px;
-            padding: 1.45rem 1.5rem;
-            box-shadow: 0 14px 34px rgba(220, 38, 38, 0.28);
+            border-radius: 16px;
+            padding: 1.35rem 1.4rem;
+            box-shadow: 0 10px 24px rgba(220, 38, 38, 0.18);
             color: #fff;
             animation: fadeIn 0.45s ease both;
         }}
@@ -357,20 +612,20 @@ def inject_styles():
         }}
 
         .metric-card {{
-            padding: 1.1rem 1rem;
-            text-align: center;
+            padding: 1.15rem 1rem;
+            text-align: left;
             height: 100%;
         }}
-        .metric-card .icon {{ font-size: 1.3rem; margin-bottom: 0.35rem; color: {DEEP_NAVY}; }}
         .metric-card .value {{
-            font-size: 1.45rem;
+            font-size: 1.4rem;
             font-weight: 800;
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
         }}
         .metric-card .subtitle {{
-            color: {SLATE_GRAY};
-            font-size: 0.82rem;
-            margin-top: 0.25rem;
+            color: {SECONDARY_TEXT};
+            font-size: 0.8rem;
+            margin-top: 0.35rem;
+            letter-spacing: 0.01em;
         }}
 
         .risk-meter, .prob-meter {{
@@ -379,7 +634,7 @@ def inject_styles():
             border-radius: 16px;
             padding: 1rem 1.15rem;
             margin: 0.65rem 0;
-            box-shadow: 0 8px 22px rgba(15, 48, 64, 0.06);
+            box-shadow: 0 8px 22px rgba(62, 50, 50, 0.06);
             animation: fadeIn 0.5s ease both;
         }}
         .risk-meter .meter-label,
@@ -388,7 +643,7 @@ def inject_styles():
             justify-content: space-between;
             font-size: 0.88rem;
             font-weight: 600;
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             margin-bottom: 0.55rem;
         }}
         .risk-meter .track,
@@ -401,13 +656,13 @@ def inject_styles():
         .risk-meter .fill {{
             height: 100%;
             border-radius: 999px;
-            background: linear-gradient(90deg, {TERRACOTTA}, #C4876F);
+            background: {WARM_SAND};
             animation: fillBar 0.85s ease;
         }}
         .prob-meter .fill {{
             height: 100%;
             border-radius: 999px;
-            background: linear-gradient(90deg, {DEEP_NAVY}, #1A455A);
+            background: {INK};
             animation: fillBar 0.85s ease;
         }}
 
@@ -417,26 +672,25 @@ def inject_styles():
         }}
         .recommend-card h4 {{
             margin: 0 0 0.4rem 0;
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
         }}
 
         /* ---------- Upload ---------- */
         .upload-zone {{
             background: {CARD_BG};
-            border: 2px dashed {WARM_SAND};
-            border-radius: 20px;
-            padding: 2rem 1.5rem;
-            text-align: center;
+            border: 1px dashed rgba(168, 124, 124, 0.55);
+            border-radius: 14px;
+            padding: 1.75rem 1.5rem;
+            text-align: left;
             margin-bottom: 1rem;
             transition: background 0.2s ease, border-color 0.2s ease;
         }}
         .upload-zone:hover {{
-            background: #FBF4EF;
-            border-color: {TERRACOTTA};
+            background: {SURFACE_ELEVATED};
+            border-color: {TEAL};
         }}
-        .upload-zone .icon {{ font-size: 2.4rem; }}
-        .upload-zone h3 {{ margin: 0.5rem 0 0.25rem 0; color: {DEEP_NAVY}; }}
-        .upload-zone p {{ margin: 0; color: {SLATE_GRAY}; }}
+        .upload-zone h3 {{ margin: 0 0 0.35rem 0; color: {PRIMARY_TEXT}; font-size: 1.05rem; }}
+        .upload-zone p {{ margin: 0; color: {SECONDARY_TEXT}; font-size: 0.92rem; }}
 
         .chart-card {{
             padding: 1rem 1rem 0.5rem 1rem;
@@ -444,37 +698,9 @@ def inject_styles():
         }}
         .chart-card h4 {{
             margin: 0 0 0.5rem 0.25rem;
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             font-size: 1rem;
         }}
-
-        .sidebar-brand {{
-            padding: 0.5rem 0.2rem 1.1rem 0.2rem;
-        }}
-        .sidebar-brand .title {{
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #fff !important;
-            line-height: 1.3;
-        }}
-        .sidebar-brand .caption {{
-            color: {WARM_SAND} !important;
-            font-size: 0.72rem;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.4rem;
-            font-weight: 700;
-        }}
-        .sidebar-meta {{
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.8) !important;
-            line-height: 1.55;
-        }}
-        .sidebar-meta strong {{ color: #fff !important; }}
 
         .detail-card {{
             padding: 1.35rem 1.4rem;
@@ -486,40 +712,56 @@ def inject_styles():
             border-radius: 12px !important;
             font-weight: 600;
             transition: all 0.2s ease;
-            border: 1px solid {BORDER};
-            background: {CARD_BG};
-            color: {DEEP_NAVY};
+            border: 1px solid {BORDER} !important;
+            background: {CARD_BG} !important;
+            color: {PRIMARY_TEXT} !important;
         }}
         .stButton > button:hover {{
             transform: translateY(-1px) scale(1.02);
-            box-shadow: 0 10px 22px rgba(15, 48, 64, 0.16);
-            border-color: {DEEP_NAVY};
+            box-shadow: 0 10px 22px rgba(62, 50, 50, 0.14);
+            border-color: {INK} !important;
         }}
-        .stButton > button[kind="primary"] {{
-            background: {DEEP_NAVY} !important;
+        .stButton > button[kind="primary"],
+        .stButton > button[data-testid="baseButton-primary"],
+        button[kind="primary"] {{
+            background: {INK} !important;
             border: none !important;
-            color: white !important;
+            color: #FFFFFF !important;
         }}
-        .stButton > button[kind="primary"]:hover {{
-            background: {PRIMARY_HOVER} !important;
+        .stButton > button[kind="primary"] *,
+        .stButton > button[data-testid="baseButton-primary"] *,
+        button[kind="primary"] p,
+        button[kind="primary"] span,
+        button[data-testid="baseButton-primary"] p,
+        button[data-testid="baseButton-primary"] span {{
+            color: #FFFFFF !important;
+        }}
+        .stButton > button[kind="primary"]:hover,
+        .stButton > button[data-testid="baseButton-primary"]:hover {{
+            background: {GRAPHITE} !important;
             transform: translateY(-1px) scale(1.02);
+            color: #FFFFFF !important;
+        }}
+        .stButton > button[kind="primary"]:hover *,
+        .stButton > button[data-testid="baseButton-primary"]:hover * {{
+            color: #FFFFFF !important;
         }}
         div.random-btn + div button {{
-            background: {DEEP_NAVY} !important;
+            background: {INK} !important;
             color: white !important;
             border: none !important;
             border-radius: 14px !important;
             font-weight: 700 !important;
         }}
         div.genuine-btn + div button {{
-            background: {TERRACOTTA} !important;
+            background: {TEAL} !important;
             color: white !important;
             border: none !important;
             border-radius: 14px !important;
             font-weight: 700 !important;
         }}
         div.fraud-btn + div button {{
-            background: {DANGER_SOFT} !important;
+            background: {WARM_SAND} !important;
             color: white !important;
             border: none !important;
             border-radius: 14px !important;
@@ -529,10 +771,12 @@ def inject_styles():
         .stTextInput input, .stNumberInput input, .stSelectbox > div > div {{
             border-radius: 12px !important;
             border: 1px solid {BORDER} !important;
+            background: {CARD_BG} !important;
+            color: {PRIMARY_TEXT} !important;
         }}
         .stTextInput input:focus, .stNumberInput input:focus {{
-            border-color: {DEEP_NAVY} !important;
-            box-shadow: 0 0 0 2px rgba(15, 48, 64, 0.15) !important;
+            border-color: {INK} !important;
+            box-shadow: 0 0 0 2px rgba(62, 50, 50, 0.15) !important;
         }}
 
         .sample-meta-card {{
@@ -545,18 +789,18 @@ def inject_styles():
             gap: 0.85rem;
         }}
         .sample-meta-item .label {{
-            color: {SLATE_GRAY};
+            color: {SECONDARY_TEXT};
             font-size: 0.78rem;
             margin-bottom: 0.2rem;
         }}
         .sample-meta-item .value {{
-            color: {DEEP_NAVY};
+            color: {PRIMARY_TEXT};
             font-weight: 700;
             font-size: 1.02rem;
         }}
         .sample-badge-fraud {{
             display: inline-block;
-            background: linear-gradient(135deg, #DC2626, #9F1239);
+            background: {DANGER};
             color: white;
             border-radius: 999px;
             padding: 0.35rem 0.85rem;
@@ -566,7 +810,7 @@ def inject_styles():
         }}
         .sample-badge-genuine {{
             display: inline-block;
-            background: linear-gradient(135deg, #16A34A, #15803D);
+            background: {SUCCESS};
             color: white;
             border-radius: 999px;
             padding: 0.35rem 0.85rem;
@@ -583,7 +827,7 @@ def inject_styles():
             transition: background 0.2s ease;
         }}
         div[data-testid="stFileUploader"]:hover {{
-            background: #FBF4EF;
+            background: {SURFACE_ELEVATED};
         }}
 
         /* Notifications */
@@ -822,6 +1066,7 @@ def page_header(title, subtitle):
     st.markdown(
         f"""
         <div class="page-header">
+            <div class="section-label">Workspace</div>
             <h1>{title}</h1>
             <p>{subtitle}</p>
         </div>
@@ -830,12 +1075,13 @@ def page_header(title, subtitle):
     )
 
 
-def rich_kpi(icon, label, value, description, variant="default"):
+def rich_kpi(label, value, description, variant="default", tag=""):
     variant_class = f" kpi-{variant}" if variant != "default" else ""
+    tag_html = f'<div class="icon">{tag}</div>' if tag else ""
     st.markdown(
         f"""
         <div class="kpi-rich{variant_class}">
-            <div class="icon">{icon}</div>
+            {tag_html}
             <div class="value">{value}</div>
             <div class="label">{label}</div>
             <div class="desc">{description}</div>
@@ -845,11 +1091,10 @@ def rich_kpi(icon, label, value, description, variant="default"):
     )
 
 
-def metric_card(icon, title, value, subtitle):
+def metric_card(title, value, subtitle):
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="icon">{icon}</div>
             <div class="value">{value}</div>
             <div class="subtitle">{title} · {subtitle}</div>
         </div>
@@ -861,14 +1106,14 @@ def metric_card(icon, title, value, subtitle):
 def style_axes(ax):
     ax.set_facecolor(CARD_BG)
     ax.figure.patch.set_facecolor(BACKGROUND)
-    ax.tick_params(colors=SLATE_GRAY)
-    ax.xaxis.label.set_color(DEEP_NAVY)
-    ax.yaxis.label.set_color(DEEP_NAVY)
-    ax.title.set_color(DEEP_NAVY)
+    ax.tick_params(colors=SECONDARY_TEXT)
+    ax.xaxis.label.set_color(PRIMARY_TEXT)
+    ax.yaxis.label.set_color(PRIMARY_TEXT)
+    ax.title.set_color(PRIMARY_TEXT)
     ax.grid(True, color=GRID, linewidth=0.8, alpha=0.85)
     ax.set_axisbelow(True)
     for spine in ax.spines.values():
-        spine.set_color("#D1D5DB")
+        spine.set_color("#D6CBCB")
 
 
 def chart_fraud_vs_genuine(genuine_count, fraud_count):
@@ -876,7 +1121,7 @@ def chart_fraud_vs_genuine(genuine_count, fraud_count):
     ax.bar(
         ["Genuine", "Fraud"],
         [genuine_count, fraud_count],
-        color=[DEEP_NAVY, TERRACOTTA],
+        color=[INK, WARM_SAND],
         edgecolor="white",
         width=0.55,
     )
@@ -888,7 +1133,7 @@ def chart_fraud_vs_genuine(genuine_count, fraud_count):
 
 def chart_amount_distribution(amounts):
     fig, ax = plt.subplots(figsize=(6, 3.8))
-    ax.hist(amounts, bins=40, color=DEEP_NAVY, edgecolor="white")
+    ax.hist(amounts, bins=40, color=INK, edgecolor="white")
     ax.set_xlabel("Amount")
     ax.set_ylabel("Frequency")
     style_axes(ax)
@@ -908,7 +1153,7 @@ def chart_probability_distribution(probabilities):
 
 def chart_risk_distribution(risk_scores):
     fig, ax = plt.subplots(figsize=(6, 3.8))
-    ax.hist(risk_scores, bins=30, color=TERRACOTTA, edgecolor="white")
+    ax.hist(risk_scores, bins=30, color=TEAL, edgecolor="white")
     ax.set_xlabel("Risk Score (/100)")
     ax.set_ylabel("Frequency")
     style_axes(ax)
@@ -930,29 +1175,43 @@ def home_page():
     st.markdown(
         f"""
         <div class="premium-hero">
-            <div class="orb orb-a"></div>
-            <div class="orb orb-b"></div>
-            <div class="orb orb-c"></div>
-            <h1>{PROJECT_TITLE}</h1>
-            <p>{PROJECT_SUBTITLE}</p>
+            <div class="hero-content">
+                <div class="hero-eyebrow">Enterprise Fraud Analytics</div>
+                <div class="hero-title">{PROJECT_TITLE}</div>
+                <p class="hero-subtitle">{PROJECT_SUBTITLE}</p>
+                <div class="hero-meta">
+                    <span class="hero-chip"><span class="dot"></span>Random Forest</span>
+                    <span class="hero-chip">Real-time Risk Scoring</span>
+                    <span class="hero-chip">Batch CSV Analysis</span>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    st.markdown(
+        """
+        <div class="section-label">Capabilities</div>
+        <div class="section-title">What you can do</div>
+        <p class="section-desc">Core workflows for detecting, scoring, and reviewing credit card fraud.</p>
+        """,
+        unsafe_allow_html=True,
+    )
+
     features = [
-        ("🛡", "Fraud Detection", "Score individual transactions with AI risk analysis."),
-        ("📂", "Batch CSV Analysis", "Upload and analyze many transactions at once."),
-        ("📈", "Interactive Dashboard", "Explore KPIs and fraud intelligence charts."),
-        ("⚡", "Risk Scoring", "View fraud probability and risk score out of 100."),
+        ("01", "Fraud Detection", "Score a single transaction with live probability and risk."),
+        ("02", "Batch Analysis", "Upload a CSV and score every row in one pass."),
+        ("03", "Dashboard", "Inspect volume, fraud rate, and model score distributions."),
+        ("04", "Risk Scoring", "Convert fraud probability into an actionable 0–100 score."),
     ]
     cols = st.columns(4)
-    for col, (icon, title, text) in zip(cols, features):
+    for col, (num, title, text) in zip(cols, features):
         with col:
             st.markdown(
                 f"""
                 <div class="feature-card">
-                    <div class="icon">{icon}</div>
+                    <div class="icon">{num}</div>
                     <h4>{title}</h4>
                     <p>{text}</p>
                 </div>
@@ -962,6 +1221,15 @@ def home_page():
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
 
+    st.markdown(
+        """
+        <div class="section-label">Dataset Overview</div>
+        <div class="section-title">Live metrics</div>
+        <p class="section-desc">Summary statistics from the active credit-card dataset.</p>
+        """,
+        unsafe_allow_html=True,
+    )
+
     df = get_dataset(uploader_key="home_dataset_upload")
     if df is None:
         return
@@ -970,44 +1238,57 @@ def home_page():
     k1, k2, k3, k4 = st.columns(4)
     with k1:
         rich_kpi(
-            "💳",
             "Total Transactions",
             f"{summary['num_rows']:,}",
-            "Records in the Kaggle dataset",
+            "Active dataset volume",
             variant="total",
+            tag="VOL",
         )
     with k2:
         rich_kpi(
-            "⚠",
             "Fraud Cases",
             f"{summary['fraudulent_transactions']:,}",
-            "Confirmed fraudulent labels",
+            "Labeled fraud rows",
             variant="fraud",
+            tag="FRD",
         )
     with k3:
         rich_kpi(
-            "🎯",
             "Model Accuracy",
             "99.95%",
-            "Random Forest test-set accuracy",
+            "Random Forest test accuracy",
             variant="genuine",
+            tag="ACC",
         )
     with k4:
         rich_kpi(
-            "⚡",
             "Risk Engine",
             "Active",
-            "Live scoring with fraud_model.pkl",
+            "Model ready for scoring",
             variant="rate",
+            tag="ENG",
         )
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     st.markdown(
         f"""
-        <div class="detail-card">
-            <p><strong>Project Topic:</strong> {PROJECT_TOPIC}</p>
-            <p><strong>Full Name:</strong> {FULL_NAME}</p>
-            <p style="margin-bottom:0;"><strong>Registered Email:</strong> {REGISTERED_EMAIL}</p>
+        <div class="section-label">Project</div>
+        <div class="section-title">Submission details</div>
+        <div class="detail-card" style="margin-top:0.85rem;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Topic</div>
+                    <div style="color:{INK};font-weight:600;">{PROJECT_TOPIC}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Author</div>
+                    <div style="color:{INK};font-weight:600;">{FULL_NAME}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Email</div>
+                    <div style="color:{INK};font-weight:600;word-break:break-all;">{REGISTERED_EMAIL}</div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1019,37 +1300,37 @@ def render_prediction_results(prediction, fraud_probability, risk_score, confide
         st.markdown(
             """
             <div class="status-fraud">
-                <div class="badge">⚠ HIGH RISK</div>
-                <h2>⚠ Fraud Detected</h2>
+                <div class="badge">HIGH RISK</div>
+                <h2>Fraud Detected</h2>
                 <p>Immediate review recommended.</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        recommendation = "⚠ Hold the transaction and perform manual verification."
+        recommendation = "Hold the transaction and perform manual verification."
     else:
         st.markdown(
             """
             <div class="status-genuine">
-                <div class="badge">✅ SAFE</div>
-                <h2>✅ Genuine Transaction</h2>
+                <div class="badge">SAFE</div>
+                <h2>Genuine Transaction</h2>
                 <p>This transaction appears safe.</p>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        recommendation = "✔ Transaction can be processed safely."
+        recommendation = "Transaction can be processed safely."
 
     st.write("")
     m1, m2, m3, m4 = st.columns(4)
     with m1:
-        metric_card("🛡", "Prediction", prediction, "Model decision")
+        metric_card("Prediction", prediction, "Model decision")
     with m2:
-        metric_card("📈", "Fraud Probability", f"{fraud_probability * 100:.2f}%", "Class 1 probability")
+        metric_card("Fraud Probability", f"{fraud_probability * 100:.2f}%", "Class 1 probability")
     with m3:
-        metric_card("⚠", "Risk Score", f"{risk_score} / 100", "Scaled risk")
+        metric_card("Risk Score", f"{risk_score} / 100", "Scaled risk")
     with m4:
-        metric_card("🎯", "Confidence", f"{confidence * 100:.2f}%", "Decision confidence")
+        metric_card("Confidence", f"{confidence * 100:.2f}%", "Decision confidence")
 
     risk_width = min(max(float(risk_score), 0.0), 100.0)
     prob_width = min(max(float(fraud_probability) * 100.0, 0.0), 100.0)
@@ -1080,7 +1361,13 @@ def render_prediction_results(prediction, fraud_probability, risk_score, confide
 
 def render_recent_predictions():
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
-    st.markdown("### Recent Predictions")
+    st.markdown(
+        """
+        <div class="section-label">History</div>
+        <div class="section-title">Recent predictions</div>
+        """,
+        unsafe_allow_html=True,
+    )
     history = st.session_state.get("recent_predictions", [])
     if not history:
         st.caption("No predictions yet. Run a demo prediction to populate this table.")
@@ -1091,11 +1378,12 @@ def render_recent_predictions():
 def render_demo_prediction():
     st.markdown(
         """
+        <div class="section-label">Demo</div>
+        <div class="section-title">Single transaction scoring</div>
+        <p class="section-desc">Load a real sample from the dataset, optionally adjust amount and hour, then score.</p>
         <div class="info-card">
-            This demonstration uses real transactions from the Kaggle Credit Card
-            Fraud Detection dataset. Hidden anonymized features (V1–V28) are loaded
-            automatically from the selected sample while you may modify the
-            transaction amount and hour before prediction.
+            Hidden anonymized features (V1–V28) are loaded from the selected sample.
+            You can edit transaction amount and hour before prediction.
         </div>
         """,
         unsafe_allow_html=True,
@@ -1106,21 +1394,27 @@ def render_demo_prediction():
 
     ensure_sample_loaded()
 
-    st.markdown("#### Load Sample from Dataset")
+    st.markdown(
+        """
+        <div class="section-label">Samples</div>
+        <div class="section-title">Load from dataset</div>
+        """,
+        unsafe_allow_html=True,
+    )
     b1, b2, b3 = st.columns(3)
     with b1:
         st.markdown('<div class="random-btn"></div>', unsafe_allow_html=True)
-        if st.button("🎲 Load Random Sample", use_container_width=True, key="load_random_btn"):
+        if st.button("Load Random Sample", use_container_width=True, key="load_random_btn"):
             load_sample_into_session(mode="random")
             st.rerun()
     with b2:
         st.markdown('<div class="genuine-btn"></div>', unsafe_allow_html=True)
-        if st.button("✅ Load Genuine Sample", use_container_width=True, key="load_genuine_btn"):
+        if st.button("Load Genuine Sample", use_container_width=True, key="load_genuine_btn"):
             load_sample_into_session(mode="genuine")
             st.rerun()
     with b3:
         st.markdown('<div class="fraud-btn"></div>', unsafe_allow_html=True)
-        if st.button("🚨 Load Fraud Sample", use_container_width=True, key="load_fraud_btn"):
+        if st.button("Load Fraud Sample", use_container_width=True, key="load_fraud_btn"):
             load_sample_into_session(mode="fraud")
             st.rerun()
 
@@ -1131,9 +1425,9 @@ def render_demo_prediction():
     class_label = "Fraud" if original_class == 1 else "Genuine"
 
     if original_class == 1:
-        badge_html = '<div class="sample-badge-fraud">🚨 Real Fraud Sample Loaded</div>'
+        badge_html = '<div class="sample-badge-fraud">Fraud sample loaded</div>'
     else:
-        badge_html = '<div class="sample-badge-genuine">✅ Genuine Sample Loaded</div>'
+        badge_html = '<div class="sample-badge-genuine">Genuine sample loaded</div>'
 
     st.markdown(
         f"""
@@ -1145,11 +1439,11 @@ def render_demo_prediction():
                     <div class="value">{sample_type}</div>
                 </div>
                 <div class="sample-meta-item">
-                    <div class="label">Original Dataset Class</div>
+                    <div class="label">Original Class</div>
                     <div class="value">{class_label}</div>
                 </div>
                 <div class="sample-meta-item">
-                    <div class="label">Dataset Row Index</div>
+                    <div class="label">Dataset Row</div>
                     <div class="value">{st.session_state.get("sample_row_index", "—")}</div>
                 </div>
                 <div class="sample-meta-item">
@@ -1170,10 +1464,17 @@ def render_demo_prediction():
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="panel-card"><h3>Transaction Details</h3>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="section-label">Inputs</div>
+        <div class="section-title">Transaction details</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="panel-card">', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     amount_value = col1.number_input(
-        "💰 Transaction Amount",
+        "Transaction Amount",
         min_value=0.0,
         max_value=30000.0,
         step=10.0,
@@ -1182,7 +1483,7 @@ def render_demo_prediction():
         key="amount_input",
     )
     hour_value = col2.number_input(
-        "🕒 Transaction Hour (0–23)",
+        "Transaction Hour (0–23)",
         min_value=0,
         max_value=23,
         step=1,
@@ -1198,7 +1499,7 @@ def render_demo_prediction():
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("⚡ Predict Transaction", type="primary", key="demo_predict_btn"):
+    if st.button("Predict Transaction", type="primary", key="demo_predict_btn"):
         try:
             # Complete vector: sampled V1–V28 + user Amount/Time only
             transaction = build_transaction(
@@ -1229,6 +1530,13 @@ def render_demo_prediction():
 
     last = st.session_state.get("last_demo_result")
     if last:
+        st.markdown(
+            """
+            <div class="section-label">Result</div>
+            <div class="section-title">Model output</div>
+            """,
+            unsafe_allow_html=True,
+        )
         render_prediction_results(
             last["prediction"],
             last["fraud_probability"],
@@ -1242,10 +1550,12 @@ def render_demo_prediction():
 def render_batch_analysis(key_prefix="batch"):
     st.markdown(
         """
+        <div class="section-label">Upload</div>
+        <div class="section-title">Transaction CSV</div>
+        <p class="section-desc">Score every row in one pass. Required model feature columns must be present.</p>
         <div class="upload-zone">
-            <div class="icon">📂</div>
-            <h3>Upload Transaction CSV</h3>
-            <p>Drag and drop a file, or browse to upload. Required model feature columns must be present.</p>
+            <h3>Drop or browse a CSV file</h3>
+            <p>Columns must include Time, Amount, and V1–V28.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1275,11 +1585,18 @@ def render_batch_analysis(key_prefix="batch"):
         st.error(f"Could not read CSV: {error}")
         return
 
-    st.markdown('<div class="panel-card"><h3>File Preview</h3>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="section-label">Preview</div>
+        <div class="section-title">File preview</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="panel-card">', unsafe_allow_html=True)
     st.dataframe(upload_df.head(10), use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("▶ Run Batch Prediction", type="primary", key=f"{key_prefix}_run"):
+    if st.button("Run Batch Prediction", type="primary", key=f"{key_prefix}_run"):
         with st.spinner("Scoring transactions…"):
             result_df, missing = process_batch_dataframe(upload_df)
 
@@ -1301,15 +1618,22 @@ def render_batch_analysis(key_prefix="batch"):
     genuine_n = int((result_df["Prediction"] == "Genuine").sum())
     fraud_pct = (fraud_n / total * 100) if total else 0.0
 
+    st.markdown(
+        """
+        <div class="section-label">Summary</div>
+        <div class="section-title">Batch results</div>
+        """,
+        unsafe_allow_html=True,
+    )
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        rich_kpi("💳", "Total Transactions", f"{total:,}", "Rows scored in this file", variant="total")
+        rich_kpi("Total Transactions", f"{total:,}", "Rows scored in this file", variant="total", tag="VOL")
     with k2:
-        rich_kpi("⚠", "Fraud Detected", f"{fraud_n:,}", "Predicted as Fraud", variant="fraud")
+        rich_kpi("Fraud Detected", f"{fraud_n:,}", "Predicted as Fraud", variant="fraud", tag="FRD")
     with k3:
-        rich_kpi("✅", "Genuine Transactions", f"{genuine_n:,}", "Predicted as Genuine", variant="genuine")
+        rich_kpi("Genuine Transactions", f"{genuine_n:,}", "Predicted as Genuine", variant="genuine", tag="GEN")
     with k4:
-        rich_kpi("📈", "Fraud Percentage", f"{fraud_pct:.2f}%", "Share of fraud predictions", variant="rate")
+        rich_kpi("Fraud Percentage", f"{fraud_pct:.2f}%", "Share of fraud predictions", variant="rate", tag="RATE")
 
     st.write("")
     st.markdown('<div class="panel-card"><h3>Processed Results</h3>', unsafe_allow_html=True)
@@ -1319,7 +1643,7 @@ def render_batch_analysis(key_prefix="batch"):
     csv_buffer = io.StringIO()
     result_df.to_csv(csv_buffer, index=False)
     st.download_button(
-        "⬇ Download Results",
+        "Download Results",
         data=csv_buffer.getvalue(),
         file_name="fraud_analysis_results.csv",
         mime="text/csv",
@@ -1329,8 +1653,8 @@ def render_batch_analysis(key_prefix="batch"):
 
 def fraud_detection_page():
     page_header(
-        "🔍 Fraud Detection",
-        "Analyze a financial transaction using an AI-powered fraud detection model.",
+        "Fraud Detection",
+        "Score a single transaction or upload a CSV for batch analysis.",
     )
     mode = st.radio(
         "Mode",
@@ -1347,7 +1671,7 @@ def fraud_detection_page():
 
 def batch_analysis_page():
     page_header(
-        "📂 Batch Analysis",
+        "Batch Analysis",
         "Upload a CSV and score every transaction with the trained Random Forest model.",
     )
     render_batch_analysis(key_prefix="batch_page")
@@ -1355,8 +1679,8 @@ def batch_analysis_page():
 
 def dashboard_page():
     page_header(
-        "📊 Dashboard",
-        "Professional analytics overview of dataset volume and model risk signals.",
+        "Dashboard",
+        "Dataset volume, fraud rate, and model score distributions.",
     )
 
     df = get_dataset(uploader_key="dashboard_dataset_upload")
@@ -1369,17 +1693,32 @@ def dashboard_page():
     fraud = summary["fraudulent_transactions"]
     fraud_rate = (fraud / total * 100) if total else 0.0
 
+    st.markdown(
+        """
+        <div class="section-label">Overview</div>
+        <div class="section-title">Key metrics</div>
+        """,
+        unsafe_allow_html=True,
+    )
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        rich_kpi("💳", "Total Transactions", f"{total:,}", "Full dataset volume", variant="total")
+        rich_kpi("Total Transactions", f"{total:,}", "Full dataset volume", variant="total", tag="VOL")
     with k2:
-        rich_kpi("⚠", "Fraud Transactions", f"{fraud:,}", "Labeled fraud cases", variant="fraud")
+        rich_kpi("Fraud Transactions", f"{fraud:,}", "Labeled fraud cases", variant="fraud", tag="FRD")
     with k3:
-        rich_kpi("✅", "Genuine Transactions", f"{genuine:,}", "Labeled genuine cases", variant="genuine")
+        rich_kpi("Genuine Transactions", f"{genuine:,}", "Labeled genuine cases", variant="genuine", tag="GEN")
     with k4:
-        rich_kpi("📈", "Fraud Rate", f"{fraud_rate:.3f}%", "Fraud share of dataset", variant="rate")
+        rich_kpi("Fraud Rate", f"{fraud_rate:.3f}%", "Fraud share of dataset", variant="rate", tag="RATE")
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="section-label">Analytics</div>
+        <div class="section-title">Distributions</div>
+        <p class="section-desc">Volume split and amount profile, plus model probability and risk charts.</p>
+        """,
+        unsafe_allow_html=True,
+    )
     scored = get_dashboard_score_sample(df)
 
     c1, c2 = st.columns(2)
@@ -1412,77 +1751,77 @@ def dashboard_page():
 
 def about_page():
     page_header(
-        "ℹ About",
-        "Internship-ready overview of the Financial Fraud Intelligence Engine.",
+        "About",
+        "Internship project overview for the Financial Fraud Intelligence Engine.",
     )
 
     st.markdown(
         f"""
-        <div class="detail-card">
-            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Project Overview</h3>
-            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
-                A premium analytics interface for detecting fraudulent credit card
-                transactions with a Random Forest model trained on the Kaggle
-                Credit Card Fraud Detection dataset.
+        <div class="section-label">Overview</div>
+        <div class="section-title">Project details</div>
+        <div class="detail-card" style="margin-top:0.85rem;">
+            <h3 style="color:{PRIMARY_TEXT}; margin-top:0; font-size:1.05rem;">Purpose</h3>
+            <p style="color:{SECONDARY_TEXT}; margin-bottom:0; line-height:1.55;">
+                Detect fraudulent credit card transactions with a Random Forest model
+                trained on the Kaggle Credit Card Fraud Detection dataset. Supports
+                single-transaction demos, batch CSV scoring, risk recommendations,
+                and an interactive analytics dashboard.
             </p>
         </div>
         <div class="detail-card">
-            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Purpose</h3>
-            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
-                Demonstrate end-to-end fraud intelligence: single-transaction demos,
-                batch CSV scoring, risk recommendations, and an interactive dashboard
-                suitable for internship presentations.
-            </p>
-        </div>
-        <div class="detail-card">
-            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Machine Learning Model</h3>
-            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
-                Random Forest Classifier loaded from <code>fraud_model.pkl</code>.
-                Predictions return class labels, fraud probability, and risk score.
-            </p>
-        </div>
-        <div class="detail-card">
-            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Dataset</h3>
-            <p style="color:{SECONDARY_TEXT}; margin-bottom:0;">
-                Kaggle Credit Card Fraud Detection Dataset — anonymized features
-                V1–V28, Time, Amount, and Class labels.
-            </p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Model</div>
+                    <div style="color:{INK};font-weight:600;margin-bottom:0.35rem;">Random Forest Classifier</div>
+                    <p style="color:{SECONDARY_TEXT};margin:0;font-size:0.92rem;line-height:1.5;">
+                        Loaded from <code>fraud_model.pkl</code>. Returns class label,
+                        fraud probability, and risk score.
+                    </p>
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Dataset</div>
+                    <div style="color:{INK};font-weight:600;margin-bottom:0.35rem;">Kaggle Credit Card Fraud</div>
+                    <p style="color:{SECONDARY_TEXT};margin:0;font-size:0.92rem;line-height:1.5;">
+                        Anonymized features V1–V28, Time, Amount, and Class labels.
+                    </p>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("### Technologies Used")
-    tech_cols = st.columns(3)
-    technologies = [
-        ("🐍", "Python"),
-        ("🐼", "Pandas"),
-        ("🧠", "Scikit-learn"),
-        ("🌐", "Streamlit"),
-        ("📊", "Matplotlib"),
-        ("🌲", "Random Forest"),
-    ]
-    for idx, (icon, tech) in enumerate(technologies):
-        with tech_cols[idx % 3]:
-            st.markdown(
-                f"""
-                <div class="feature-card">
-                    <div class="icon">{icon}</div>
-                    <h4>{tech}</h4>
-                    <p>Part of the fraud intelligence stack.</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+    st.markdown(
+        """
+        <div class="section-label">Stack</div>
+        <div class="section-title">Technologies</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    technologies = ["Python", "Pandas", "Scikit-learn", "Streamlit", "Matplotlib", "Random Forest"]
+    pills = "".join(f'<span class="tech-pill">{tech}</span>' for tech in technologies)
+    st.markdown(f"<div style='margin:0.5rem 0 1.25rem 0;'>{pills}</div>", unsafe_allow_html=True)
 
     st.markdown('<hr class="section-divider" />', unsafe_allow_html=True)
     st.markdown(
         f"""
-        <div class="detail-card">
-            <h3 style="color:{DEEP_NAVY}; margin-top:0;">Developer Information</h3>
-            <p><strong>Name:</strong> {FULL_NAME}</p>
-            <p><strong>Email:</strong> {REGISTERED_EMAIL}</p>
-            <p style="margin-bottom:0;"><strong>Project Type:</strong> Internship Project</p>
+        <div class="section-label">Author</div>
+        <div class="section-title">Developer information</div>
+        <div class="detail-card" style="margin-top:0.85rem;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Name</div>
+                    <div style="color:{INK};font-weight:600;">{FULL_NAME}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Email</div>
+                    <div style="color:{INK};font-weight:600;word-break:break-all;">{REGISTERED_EMAIL}</div>
+                </div>
+                <div>
+                    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:{TEAL};font-weight:700;margin-bottom:0.35rem;">Type</div>
+                    <div style="color:{INK};font-weight:600;">Internship Project</div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1498,33 +1837,54 @@ with st.sidebar:
     st.markdown(
         """
         <div class="sidebar-brand">
-            <div class="caption">PREMIUM ANALYTICS</div>
-            <div class="title">🛡 Fraud Intelligence Engine</div>
+            <div class="logo-mark">FI</div>
+            <div class="brand-copy">
+                <div class="caption">Intelligence Suite</div>
+                <div class="title">Fraud Engine</div>
+            </div>
         </div>
+        <div class="nav-section-label">Navigation</div>
         """,
         unsafe_allow_html=True,
     )
-    page = st.radio("Navigation", PAGES, label_visibility="collapsed")
+    page = st.radio(
+        "Navigation",
+        PAGES,
+        label_visibility="collapsed",
+        key="main_nav",
+    )
     st.markdown(
         """
         <div class="sidebar-meta">
-            ------------------------<br/>
-            <strong>Model</strong><br/>Random Forest<br/><br/>
-            <strong>Dataset</strong><br/>Kaggle Credit Card Fraud<br/><br/>
-            <strong>Version</strong><br/>1.0<br/>
-            ------------------------
+            <div class="meta-row">
+                <span class="meta-key">Status</span>
+                <span class="status-pill"><span class="status-dot"></span>ONLINE</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Model</span>
+                <span class="meta-val">Random Forest</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Dataset</span>
+                <span class="meta-val">Credit Card</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Version</span>
+                <span class="meta-val">1.0.0</span>
+            </div>
         </div>
+        <div class="sidebar-footer">Financial Fraud Intelligence</div>
         """,
         unsafe_allow_html=True,
     )
 
-if page.endswith("Home"):
+if page == "Home":
     home_page()
-elif page.endswith("Fraud Detection"):
+elif page == "Fraud Detection":
     fraud_detection_page()
-elif page.endswith("Batch Analysis"):
+elif page == "Batch Analysis":
     batch_analysis_page()
-elif page.endswith("Dashboard"):
+elif page == "Dashboard":
     dashboard_page()
 else:
     about_page()
